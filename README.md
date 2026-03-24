@@ -2,6 +2,8 @@
 
 This is a terminal 2.5D game about mazes.
 
+<div align="center"><img src="https://github.com/Melyohin-AA/AMaze/raw/master/images/corridor.png" alt="main"></div>
+
 Features we have:
 * 120x80 char screen resolution
 * 7 char brightness levels
