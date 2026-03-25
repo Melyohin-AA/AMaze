@@ -10,29 +10,29 @@ internal class Program
 		var game = new Game(120, 80);
 		while (true)
 		{
-			game.Camera.Scan(game.Shapes);
+			game.Camera.Scan(game.Walls);
 			game.Camera.Buffer = game.Renderer.Render(game.Camera.Buffer);
 			while (Console.KeyAvailable)
 				Console.ReadKey(true);
 			switch (Console.ReadKey(true).Key)
 			{
 				case ConsoleKey.W:
-					game.Camera.Move(speed, 0.0);
+					game.Camera.Move(speed, 0.0, game.Walls);
 					break;
 				case ConsoleKey.S:
-					game.Camera.Move(-speed, 0.0);
+					game.Camera.Move(-speed, 0.0, game.Walls);
 					break;
 				case ConsoleKey.A:
-					game.Camera.Move(-speed, Math.PI / 2);
+					game.Camera.Move(-speed, Math.PI / 2, game.Walls);
 					break;
 				case ConsoleKey.D:
-					game.Camera.Move(speed, Math.PI / 2);
+					game.Camera.Move(speed, Math.PI / 2, game.Walls);
 					break;
 				case ConsoleKey.Q:
-					game.Camera.Rot -= game.Camera.Step * 5;
+					game.Camera.Rotate(-game.Camera.FovStep * 5);
 					break;
 				case ConsoleKey.E:
-					game.Camera.Rot += game.Camera.Step * 5;
+					game.Camera.Rotate(game.Camera.FovStep * 5);
 					break;
 			}
 		}

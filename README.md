@@ -1,4 +1,4 @@
-# AMaze v0.1
+# AMaze v0.2
 
 This is a terminal 2.5D game about mazes.
 
@@ -9,10 +9,10 @@ Features we have:
 * 7 char brightness levels
 * 90 degrees FOV + fisheye
 * No overdraw
+* Wall collision
 
 Features we don't have:
 * Mazes
-* Wall collision
 * Points of interest
 * Challenges or goals
 

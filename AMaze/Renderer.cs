@@ -18,7 +18,7 @@ internal class Renderer
 	{
 		for (int i = 0; i < ViewportWidth; i++)
 		{
-			/*
+			/* With overdraw
 			if (data[i] == buffer[i]) continue;
 			(int newV, byte newB) = data[i];
 			(int oldV, byte oldB) = buffer[i];
@@ -29,7 +29,7 @@ internal class Renderer
 			(var bg, var fg) = ConvertBrightness(newB);
 			Console.MoveBufferArea(i, newTop, 1, newV, ViewportWidth, 0, '#', fg, bg);
 			//*/
-			//*
+			//* No overdraw
 			if (data[i] == buffer[i]) continue;
 			(int newV, byte newB) = data[i];
 			(int oldV, byte oldB) = buffer[i];
