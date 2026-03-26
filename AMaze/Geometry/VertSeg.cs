@@ -13,18 +13,23 @@ internal class VertSeg : IGeom
 		Length = length;
 	}
 
-	public bool Intersect(Seg seg, out (double, double) intersection)
+	public bool Intersect(Ray ray, out (double, double) intersection)
 	{
 		intersection = default;
-		if (seg.x1 == seg.x2)
+		if (ray.dirX == 0.0)
 			return false;
-		double tg = (X - seg.x1) / (seg.x2 - seg.x1);
-		if ((tg < 0.0) || (tg > 1.0))
+		double tg = (X - ray.originX) / ray.dirX;
+		if (tg < 0.0)
 			return false;
-		double y = seg.y1 + tg * (seg.y2 - seg.y1);
+		double y = ray.originY + tg * ray.dirY;
 		if ((y < Y) || (y > Y + Length))
 			return false;
 		intersection = (X, y);
 		return true;
+	}
+
+	public bool DoesIntersect(Rect rect)
+	{
+		return (X >= rect.x1) && (X <= rect.x2) && (Y + Length >= rect.y1) && (Y <= rect.y2);
 	}
 }

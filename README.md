@@ -1,4 +1,4 @@
-# AMaze v0.2
+# AMaze v0.3
 
 This is a terminal 2.5D game about mazes.
 
@@ -6,7 +6,7 @@ This is a terminal 2.5D game about mazes.
 
 Features we have:
 * 120x80 char screen resolution
-* 7 char brightness levels
+* 31 char brightness levels
 * 90 degrees FOV + fisheye
 * No overdraw
 * Wall collision

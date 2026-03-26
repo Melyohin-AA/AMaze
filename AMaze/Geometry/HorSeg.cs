@@ -13,18 +13,28 @@ internal class HorSeg : IGeom
 		Length = length;
 	}
 
-	public bool Intersect(Seg seg, out (double, double) intersection)
+	public bool Intersect(Ray ray, out (double, double) intersection)
 	{
 		intersection = default;
-		if (seg.y1 == seg.y2)
+		if (ray.dirY == 0.0)
 			return false;
-		double tg = (Y - seg.y1) / (seg.y2 - seg.y1);
-		if ((tg < 0.0) || (tg > 1.0))
+		double tg = (Y - ray.originY) / ray.dirY;
+		if (tg < 0.0)
 			return false;
-		double x = seg.x1 + tg * (seg.x2 - seg.x1);
+		double x = ray.originX + tg * ray.dirX;
 		if ((x < X) || (x > X + Length))
 			return false;
 		intersection = (x, Y);
 		return true;
+	}
+
+	public bool DoesIntersect(Rect rect)
+	{
+		//if ((Y < rect.y1) || (Y > rect.y2))
+		//	return false;
+		//if ((X + Length < rect.x1) || (X > rect.x2))
+		//	return false;
+		//return true;
+		return (Y >= rect.y1) && (Y <= rect.y2) && (X + Length >= rect.x1) && (X <= rect.x2);
 	}
 }
