@@ -9,7 +9,7 @@ Features we have:
 * 15 char brightness levels
 * 2 color palettes
 * 90 degrees FOV + fisheye
-* -No overdraw- Yes overdraw
+* ~~No overdraw~~ Yes overdraw
 * Wall collision
 * Invisible walls and Ghost-walls
 
