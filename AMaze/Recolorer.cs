@@ -1,7 +1,8 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace AMaze.Recolor;
+namespace AMaze;
 
 internal static class Recolorer
 {
@@ -33,8 +34,13 @@ internal static class Recolorer
 		IntPtr hConsoleOutput = GetStdHandle(stdOutputHandle);
 		ConsoleScreeenBufferInfoEx csbe = GetBufferInfo(hConsoleOutput);
 		for (byte i = 0; i < 16; i++)
-			csbe.colors[i] = new ColorRef(colorValues[i]);
+			csbe.colors[i] = ColorRef(colorValues[i]);
 		SetBufferInfo(hConsoleOutput, csbe);
+	}
+
+	private static int ColorRef(Color color)
+	{
+		return (color.B << 16) | (color.G << 8) | color.R;
 	}
 
 	private static ConsoleScreeenBufferInfoEx GetBufferInfo(IntPtr hConsoleOutput)
@@ -42,9 +48,9 @@ internal static class Recolorer
 		var csbe = new ConsoleScreeenBufferInfoEx();
 		csbe.cbSize = Marshal.SizeOf(csbe);
 		if (hConsoleOutput == -1)
-			throw new RecolorException(Marshal.GetLastWin32Error());
+			throw new Win32Exception(Marshal.GetLastWin32Error());
 		if (!GetConsoleScreenBufferInfoEx(hConsoleOutput, ref csbe))
-			throw new RecolorException(Marshal.GetLastWin32Error());
+			throw new Win32Exception(Marshal.GetLastWin32Error());
 		return csbe;
 	}
 
@@ -53,7 +59,7 @@ internal static class Recolorer
 		csbe.window.bottom++;
 		csbe.window.right++;
 		if (!SetConsoleScreenBufferInfoEx(hConsoleOutput, ref csbe))
-			throw new RecolorException(Marshal.GetLastWin32Error());
+			throw new Win32Exception(Marshal.GetLastWin32Error());
 	}
 
 	[DllImport("kernel32.dll", SetLastError = true)]
@@ -78,17 +84,7 @@ internal static class Recolorer
 		public bool fullscreenSupported;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-		public ColorRef[] colors;
-	}
-	
-	private struct ColorRef
-	{
-		public readonly int value;
-
-		public ColorRef(Color color)
-		{
-			value = (color.B << 16) | (color.G << 8) | color.R;
-		}
+		public int[] colors;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]

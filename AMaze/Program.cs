@@ -76,6 +76,6 @@ internal class Program
 			int brightness = i * light;
 			colors[i] = Color.FromArgb(brightness, brightness, brightness);
 		}
-		Recolor.Recolorer.Recolor(colors);
+		Recolorer.Recolor(colors);
 	}
 }
