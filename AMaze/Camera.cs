@@ -9,6 +9,8 @@ internal class Camera
 	public double DepthCap { get; }
 	public double InnerDist { get; }
 
+	public double BobbingPhi { get; set; }
+
 	public Camera(Player player, int viewportWidth, int viewportHeight, double fov, double depthCap, double innerDist)
 	{
 		Player = player;
@@ -21,6 +23,7 @@ internal class Camera
 
 	public void Scan(Entities.IEnity[] entities, List<Renderer.Line>[] scanBuffer)
 	{
+		double bobbingY = Math.Sin(BobbingPhi) * 0.05;
 		var intersections = new List<(double, ScanIntersectionExtra)>(64);
 		var ray = new Geometry.Ray { originX = Player.X, originY = Player.Y };
 		for (int i = 0; i < ViewportWidth; i++)
@@ -33,8 +36,8 @@ internal class Camera
 			foreach ((double dist2, ScanIntersectionExtra extra) in intersections)
 			{
 				double dist = Math.Sqrt(dist2);
-				double screenedTop = extra.top * InnerDist / dist;
-				double screenedBottom = extra.bottom * InnerDist / dist;
+				double screenedTop = extra.top * InnerDist / dist + bobbingY;
+				double screenedBottom = extra.bottom * InnerDist / dist + bobbingY;
 				double brightness = 1.0 - dist / DepthCap;
 				var line = Renderer.Line.FromNative(ViewportHeight, screenedTop, screenedBottom, brightness, extra);
 				scanBuffer[i].Add(line);

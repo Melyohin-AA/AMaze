@@ -27,4 +27,44 @@ internal class Game
 			new Entities.Wall(new Geometry.VertSeg(-10, -10, 20), isVisible: false),
 		};
 	}
+
+	public bool Tick()
+	{
+		const double speed = 0.1;
+		ConsoleKey key = default;
+		while (Console.KeyAvailable)
+			key = Console.ReadKey(true).Key;
+		bool moved = false;
+		switch (key)
+		{
+			case ConsoleKey.W:
+				Player.Move(speed, 0.0, Entities);
+				moved = true;
+				break;
+			case ConsoleKey.S:
+				Player.Move(-speed, 0.0, Entities);
+				moved = true;
+				break;
+			case ConsoleKey.A:
+				Player.Move(-speed, Math.PI / 2, Entities);
+				moved = true;
+				break;
+			case ConsoleKey.D:
+				Player.Move(speed, Math.PI / 2, Entities);
+				moved = true;
+				break;
+			case ConsoleKey.Q:
+				Player.Rotate(-Camera.FovStep * 5);
+				break;
+			case ConsoleKey.E:
+				Player.Rotate(Camera.FovStep * 5);
+				break;
+		}
+		if (moved)
+			Camera.BobbingPhi += 0.3;
+		else Camera.BobbingPhi = 0.0;
+		Camera.Scan(Entities, Renderer.Buffer);
+		Renderer.Render();
+		return key != ConsoleKey.None;
+	}
 }

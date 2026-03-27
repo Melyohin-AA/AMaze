@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 
 namespace AMaze;
 
@@ -6,39 +7,23 @@ internal class Program
 {
 	static void Main()
 	{
-		const double speed = 0.1;
 		const int vph = 120, vpw = vph * 3 / 2;
+		const int targetPeriod = 40, possibleOversleepAmount = 16;
 		Console.Title = "AMaze";
 		ConfigureViewport(vpw, vph);
 		ApplyPalette();
 		var game = new Game(vpw, vph);
+		var sw = new Stopwatch();
 		while (true)
 		{
-			game.Camera.Scan(game.Entities, game.Renderer.Buffer);
-			game.Renderer.Render();
-			while (Console.KeyAvailable)
-				Console.ReadKey(true);
-			switch (Console.ReadKey(true).Key)
-			{
-				case ConsoleKey.W:
-					game.Player.Move(speed, 0.0, game.Entities);
-					break;
-				case ConsoleKey.S:
-					game.Player.Move(-speed, 0.0, game.Entities);
-					break;
-				case ConsoleKey.A:
-					game.Player.Move(-speed, Math.PI / 2, game.Entities);
-					break;
-				case ConsoleKey.D:
-					game.Player.Move(speed, Math.PI / 2, game.Entities);
-					break;
-				case ConsoleKey.Q:
-					game.Player.Rotate(-game.Camera.FovStep * 5);
-					break;
-				case ConsoleKey.E:
-					game.Player.Rotate(game.Camera.FovStep * 5);
-					break;
-			}
+			sw.Restart();
+			bool c = game.Tick();
+			int frametime = (int)sw.ElapsedMilliseconds;
+			int left = targetPeriod - frametime;
+			if (left > possibleOversleepAmount)
+				Thread.Sleep(left - possibleOversleepAmount);
+			while (sw.ElapsedMilliseconds < targetPeriod) ;
+			Console.Title = $"{c} p={sw.ElapsedMilliseconds} ft={frametime}";
 		}
 	}
 
