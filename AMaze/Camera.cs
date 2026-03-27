@@ -19,7 +19,7 @@ internal class Camera
 		Perpective = perpective;
 	}
 
-	public void Scan(Geometry.IGeom[] walls, Renderer.Line[] scanBuffer)
+	public void Scan(Wall[] walls, Renderer.Line[] scanBuffer)
 	{
 		var ray = new Geometry.Ray { originX = Player.X, originY = Player.Y };
 		for (int i = 0; i < ViewportWidth; i++)
@@ -27,24 +27,31 @@ internal class Camera
 			double dir = (i - ViewportWidth / 2) * FovStep;
 			ray.dirX = Math.Cos(Player.Rot + dir);
 			ray.dirY = Math.Sin(Player.Rot + dir);
-			double dist = GetDistToNearestPoint(ray, walls);// * (Math.Cos(dir) / 2 + 0.5);
+			(double dist, Wall? nearestWall) = GetDistToNearestPoint(ray, walls);// * (Math.Cos(dir) / 2 + 0.5);
 			double value = Perpective / dist;
 			double brightness = 1.0 - dist / DepthCap; //(dist - Player.HitboxHalf)
-			scanBuffer[i] = Renderer.Line.FromNative(ViewportHeight, value, brightness);
+			bool altPalette = nearestWall?.AltPalette ?? false;
+			scanBuffer[i] = Renderer.Line.FromNative(ViewportHeight, value, brightness, altPalette);
 		}
 	}
-	private double GetDistToNearestPoint(Geometry.Ray ray, Geometry.IGeom[] walls)
+	private (double, Wall?) GetDistToNearestPoint(Geometry.Ray ray, Wall[] walls)
 	{
 		double minDist2 = double.MaxValue;
-		foreach (Geometry.IGeom wall in walls)
+		Wall? nearestWall = null;
+		foreach (Wall wall in walls)
 		{
-			if (!wall.Intersect(ray, out (double, double) intersection)) continue;
-			(double px, double py) = intersection;
-			double dx = Player.X - px, dy = Player.Y - py;
-			double dist2 = dx * dx + dy * dy;
-			if (minDist2 > dist2)
-				minDist2 = dist2;
+			if (wall.IsVisible && wall.Geom.Intersect(ray, out (double, double) intersection))
+			{
+				(double px, double py) = intersection;
+				double dx = Player.X - px, dy = Player.Y - py;
+				double dist2 = dx * dx + dy * dy;
+				if (minDist2 > dist2)
+				{
+					minDist2 = dist2;
+					nearestWall = wall;
+				}
+			}
 		}
-		return Math.Sqrt(minDist2);
+		return (Math.Sqrt(minDist2), nearestWall);
 	}
 }

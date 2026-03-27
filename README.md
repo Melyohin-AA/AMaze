@@ -1,15 +1,17 @@
-# AMaze v0.4
+# AMaze v0.5
 
 This is a terminal 2.5D game about mazes.
 
 <div align="center"><img src="https://github.com/Melyohin-AA/AMaze/raw/master/images/main.png" alt="main"></div>
 
 Features we have:
-* 120x80 char screen resolution
-* 31 char brightness levels
+* 180x120 char screen resolution
+* 15 char brightness levels
+* 2 color palettes
 * 90 degrees FOV + fisheye
-* No overdraw
+* -No overdraw- Yes overdraw
 * Wall collision
+* Invisible walls and Ghost-walls
 
 Features we don't have:
 * Mazes

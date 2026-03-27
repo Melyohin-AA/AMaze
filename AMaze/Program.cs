@@ -7,10 +7,11 @@ internal class Program
 	static void Main()
 	{
 		const double speed = 0.2;
+		const int vph = 120, vpw = vph * 3 / 2;
 		Console.Title = "AMaze";
-		ConfigureViewport(120, 80);
+		ConfigureViewport(vpw, vph);
 		ApplyPalette();
-		var game = new Game(120, 80);
+		var game = new Game(vpw, vph);
 		while (true)
 		{
 			game.Camera.Scan(game.Walls, game.Renderer.Buffer);
@@ -66,15 +67,16 @@ internal class Program
 		Console.CursorVisible = false;
 	}
 
-	private static void ApplyPalette(byte light = 17)
+	private static void ApplyPalette(byte light = 34)
 	{
-		if (light > 17)
+		if (light > 34)
 			throw new ArgumentOutOfRangeException(nameof(light));
 		var colors = new Color[16];
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			int brightness = i * light;
 			colors[i] = Color.FromArgb(brightness, brightness, brightness);
+			colors[i + 8] = Color.FromArgb(brightness, 0, 0);
 		}
 		Recolorer.Recolor(colors);
 	}

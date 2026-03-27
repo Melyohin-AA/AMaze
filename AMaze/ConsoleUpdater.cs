@@ -31,28 +31,18 @@ internal static class ConsoleUpdater
 		return (buffer, width, height);
 	}
 
-	public static void Update(Span<Cell> cells)
+	public static void SetCell(short x, short y, char ch, Color color)
 	{
-		short minX = short.MaxValue, minY = short.MaxValue, maxX = short.MinValue, maxY = short.MinValue;
-		for (int i = 0; i < cells.Length; i++)
-		{
-			ref readonly Cell c = ref cells[i];
-			int index = c.Y * bufferWidth + c.X;
-			backBuffer[index].UnicodeChar = c.Char;
-			backBuffer[index].Attributes = c.Color.Value;
-			if (c.X < minX)
-				minX = c.X;
-			if (c.Y < minY)
-				minY = c.Y;
-			if (c.X > maxX)
-				maxX = c.X;
-			if (c.Y > maxY)
-				maxY = c.Y;
-		}
-		if ((minX > maxX) || (minY > maxY)) return;
-		var writeRegion = new SmallRect() { left = minX, top = minY, right = maxX, bottom = maxY };
+		int index = y * bufferWidth + x;
+		backBuffer[index].UnicodeChar = ch;
+		backBuffer[index].Attributes = color.Value;
+	}
+
+	public static void Flush()
+	{
+		var writeRegion = new SmallRect() { left = 0, top = 0, right = bufferWidth, bottom = bufferHeight };
 		var bufferSize = new Coord { x = bufferWidth, y = bufferHeight };
-		var bufferCoord = new Coord { x = (short)minX, y = (short)minY };
+		var bufferCoord = new Coord { x = 0, y = 0 };
 		if (!WriteConsoleOutputW(stdout, backBuffer, bufferSize, bufferCoord, ref writeRegion))
 			throw new Win32Exception(Marshal.GetLastWin32Error());
 	}
@@ -68,22 +58,6 @@ internal static class ConsoleUpdater
 		public Color(ConsoleColor backColor, ConsoleColor foreColor)
 		{
 			Value = (short)(((int)backColor << 4) | (int)foreColor);
-		}
-	}
-
-	public readonly struct Cell
-	{
-		public short X { get; }
-		public short Y { get; }
-		public char Char { get; }
-		public Color Color { get; }
-
-		public Cell(short x, short y, char ch, Color color)
-		{
-			X = x;
-			Y = y;
-			Char = ch;
-			Color = color;
 		}
 	}
 
