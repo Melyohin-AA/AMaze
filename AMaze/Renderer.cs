@@ -1,64 +1,73 @@
-﻿namespace AMaze;
+﻿using System.Diagnostics;
+
+namespace AMaze;
 
 internal class Renderer
 {
 	public int ViewportWidth { get; }
 	public int ViewportHeight { get; }
 
-	public Line[] Buffer { get; private set; }
+	public List<Line>[] Buffer { get; private set; }
 
 	public Renderer(int viewportWidth, int viewportHeight)
 	{
 		ViewportWidth = viewportWidth;
 		ViewportHeight = viewportHeight;
-		Buffer = new Line[viewportWidth];
+		Buffer = new List<Line>[viewportWidth];
+		for (int i = 0; i < ViewportWidth; i++)
+			Buffer[i] = new List<Line>();
 	}
 
 	public void Render()
 	{
-		for (int x = 0; x < ViewportWidth; x++)
+		//var sw = Stopwatch.StartNew();
+		for (short x = 0; x < ViewportWidth; x++)
 		{
-			Line next = Buffer[x];
-			int nextTop = next.Top(ViewportHeight);
-			ConsoleUpdater.Color color = next.Color();
-			DrawLine(x, 0, nextTop, '#', default);
-			DrawLine(x, nextTop, next.val, '#', color);
-			int bottom = nextTop + next.val;
-			DrawLine(x, bottom, ViewportHeight - bottom, '#', default);
+			var lines = Buffer[x];
+			for (short y = 0; y < ViewportHeight; y++)
+			{
+				int lineSelected = -1;
+				for (short i = 0; i < lines.Count; i++)
+				{
+					if ((y >= lines[i].top) && (y < lines[i].bottom))
+					{
+						lineSelected = i;
+						break;
+					}
+				}
+				ConsoleUpdater.Color color = (lineSelected == -1) ? default : lines[lineSelected].color;
+				ConsoleUpdater.SetCell(x, y, '#', color);
+			}
 		}
+		//var e1 = sw.Elapsed;
 		ConsoleUpdater.Flush();
-	}
-	private static void DrawLine(int left, int top, int height, char ch, ConsoleUpdater.Color color)
-	{
-		for (int i = 0; i < height; i++)
-			ConsoleUpdater.SetCell((short)left, (short)(top + i), ch, color);
+		//var e2 = sw.Elapsed - e1;
+		//Console.Title = $"{e1.Microseconds} | {e2.Microseconds}";
 	}
 
 	public struct Line
 	{
 		public const byte MaxBrightness = 14;
 
-		public int val;
-		public byte br;
-		public bool altPalette;
+		public int top, bottom;
+		public ConsoleUpdater.Color color;
 
-		public static Line FromNative(int viewportHeight, double value, double brightness, bool altPalette)
+		public static Line FromNative(int viewportHeight,
+			double top, double bottom, double brightness, ScanIntersectionExtra extra)
 		{
 			brightness = Math.Min(1.0, Math.Max(0.0, brightness));
 			return new Line {
-				val = (int)Math.Min(value, viewportHeight),
-				br = (byte)Math.Round(brightness * MaxBrightness),
-				altPalette = altPalette,
+				top = ProjectNormHeight(top, viewportHeight),
+				bottom = ProjectNormHeight(bottom, viewportHeight),
+				color = GetColor((byte)Math.Round(brightness * MaxBrightness), extra.altPalette),
 			};
 		}
-
-		public readonly int Top(int viewportHeight)
+		private static int ProjectNormHeight(double h, int viewportHeight)
 		{
-			int top = (viewportHeight - val) / 2;
-			return (top >= 0) ? top : 0;
+			double renormedHeight = 1.0 - (h + 1.0) / 2;
+			return (int)(renormedHeight * viewportHeight);
 		}
-
-		public readonly ConsoleUpdater.Color Color()
+		private static ConsoleUpdater.Color GetColor(byte br, bool altPalette)
 		{
 			if (br > MaxBrightness)
 				throw new ArgumentOutOfRangeException(nameof(br));

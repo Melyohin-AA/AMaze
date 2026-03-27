@@ -2,7 +2,7 @@
 
 internal interface IGeom
 {
-	public bool Intersect(Ray ray, out (double, double) intersection);
+	bool Intersect(Ray ray, out (double, double) intersection);
 
-	public bool DoesIntersect(Rect rect);
+	bool DoesIntersect(Rect rect);
 }

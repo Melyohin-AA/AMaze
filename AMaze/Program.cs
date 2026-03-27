@@ -6,7 +6,7 @@ internal class Program
 {
 	static void Main()
 	{
-		const double speed = 0.2;
+		const double speed = 0.1;
 		const int vph = 120, vpw = vph * 3 / 2;
 		Console.Title = "AMaze";
 		ConfigureViewport(vpw, vph);
@@ -14,23 +14,23 @@ internal class Program
 		var game = new Game(vpw, vph);
 		while (true)
 		{
-			game.Camera.Scan(game.Walls, game.Renderer.Buffer);
+			game.Camera.Scan(game.Entities, game.Renderer.Buffer);
 			game.Renderer.Render();
 			while (Console.KeyAvailable)
 				Console.ReadKey(true);
 			switch (Console.ReadKey(true).Key)
 			{
 				case ConsoleKey.W:
-					game.Player.Move(speed, 0.0, game.Walls);
+					game.Player.Move(speed, 0.0, game.Entities);
 					break;
 				case ConsoleKey.S:
-					game.Player.Move(-speed, 0.0, game.Walls);
+					game.Player.Move(-speed, 0.0, game.Entities);
 					break;
 				case ConsoleKey.A:
-					game.Player.Move(-speed, Math.PI / 2, game.Walls);
+					game.Player.Move(-speed, Math.PI / 2, game.Entities);
 					break;
 				case ConsoleKey.D:
-					game.Player.Move(speed, Math.PI / 2, game.Walls);
+					game.Player.Move(speed, Math.PI / 2, game.Entities);
 					break;
 				case ConsoleKey.Q:
 					game.Player.Rotate(-game.Camera.FovStep * 5);

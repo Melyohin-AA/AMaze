@@ -18,7 +18,7 @@ internal class Player
 		return new Geometry.Rect { x1 = x - HitboxHalf, y1 = y - HitboxHalf, x2 = x + HitboxHalf, y2 = y + HitboxHalf };
 	}
 
-	public void Move(double step, double rotOffset, Wall[] walls)
+	public void Move(double step, double rotOffset, Entities.IEnity[] entities)
 	{
 		double dx = Math.Cos(Rot + rotOffset) * step;
 		double dy = Math.Sin(Rot + rotOffset) * step;
@@ -28,16 +28,16 @@ internal class Player
 		(vectors[1], vectors[2]) = (Math.Abs(dx) > Math.Abs(dy)) ? (vx, vy) : (vy, vx);
 		foreach ((double vdx, double vdy) in vectors)
 		{
-			if (DoesCollide(MakeHitbox(X + vdx, Y + vdy), walls)) continue;
+			if (DoesCollide(MakeHitbox(X + vdx, Y + vdy), entities)) continue;
 			X += vdx;
 			Y += vdy;
 			return;
 		}
 	}
-	private static bool DoesCollide(Geometry.Rect hitbox, Wall[] walls)
+	private static bool DoesCollide(Geometry.Rect hitbox, Entities.IEnity[] entities)
 	{
-		foreach (Wall wall in walls)
-			if (!wall.IsGhost && wall.Geom.DoesIntersect(hitbox))
+		foreach (Entities.IEnity enity in entities)
+			if (enity.DoesCollide(hitbox))
 				return true;
 		return false;
 	}
