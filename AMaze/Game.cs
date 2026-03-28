@@ -12,7 +12,9 @@ internal class Game
 		Renderer = new Renderer(viewportWidth, viewportHeight);
 		Player = new Player(0.8);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, 20, 2.0);
-		Entities = new[] {
+		var door = new Entities.Wall(new Geometry.VertSeg(11, -1, 2), altPalette: true);
+		Entities = new Entities.IEnity[] {
+			new Entities.Key(-3, -6, door),
 			// Left and right walls
 			new Entities.Wall(new Geometry.HorSeg(-10, -10, 20)),
 			new Entities.Wall(new Geometry.HorSeg(-10, 10, 20)),
@@ -20,11 +22,17 @@ internal class Game
 			new Entities.Wall(new Geometry.VertSeg(10, -10, 9)),
 			new Entities.Wall(new Geometry.HorSeg(10, -1, 1)),
 			new Entities.Wall(new Geometry.VertSeg(10, -1, 2), bottom: 0.8, isGhost: true, opaque: false),
-			new Entities.Wall(new Geometry.VertSeg(11, -1, 2), isGhost: true, altPalette: true),
+			door,
 			new Entities.Wall(new Geometry.HorSeg(10, 1, 1)),
 			new Entities.Wall(new Geometry.VertSeg(10, 1, 9)),
 			// Invisible back wall
 			new Entities.Wall(new Geometry.VertSeg(-10, -10, 20), isVisible: false),
+			// Mid grid wall
+			new Entities.Wall(new Geometry.VertSeg(8, -3, 6), bottom: 0.8, opaque: false),
+			new Entities.Wall(new Geometry.VertSeg(8, -3, 6), top: -0.8, opaque: false),
+			new Entities.Grid(new Geometry.VertSeg(8, -3, 6), top: 0.8, bottom: -0.8),
+			new Entities.Wall(new Geometry.VertSeg(8, -8, 5)),
+			new Entities.Wall(new Geometry.VertSeg(8, 3, 5)),
 		};
 	}
 

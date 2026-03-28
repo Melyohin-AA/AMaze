@@ -13,15 +13,15 @@ internal class HorSeg : IGeom
 		Length = length;
 	}
 
-	public bool Intersect(Ray ray, out (double, double) intersection)
+	public bool Intersect(Seg sight, out (double, double) intersection)
 	{
 		intersection = default;
-		if (ray.dirY == 0.0)
+		if (sight.y1 == sight.y2)
 			return false;
-		double tg = (Y - ray.originY) / ray.dirY;
-		if (tg < 0.0)
+		double t = (Y - sight.y1) / (sight.y2 - sight.y1);
+		if ((t < 0.0) || (t > 1.0))
 			return false;
-		double x = ray.originX + tg * ray.dirX;
+		double x = sight.x1 + t * (sight.x2 - sight.x1);
 		if ((x < X) || (x > X + Length))
 			return false;
 		intersection = (x, Y);

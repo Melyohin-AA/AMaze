@@ -1,3 +1,9 @@
+### v0.8
+* Optimized layered rendering
+* Switched from ray to segment for sight again
+* Added `Grid` and `Key` entities
+* Added `Face` geometry and returned `Circle` geometry
+
 ### v0.7
 * Switched to real-time game cycle
 * Added camera bobbing effect
@@ -15,12 +21,15 @@
 * Switched to WinAPI to update console area which greatly improved performance.
 
 ### v0.3
+* Split wall ray scanning and wall collision logic
 * Reworked wall collision: player got a hitbox
 * Added support for 31 char brightness levels
+* Switched back from segment to ray for sight
 
 ### v0.2
-* Replaced 'Rect' and 'Circle' obstacles with 'VertSeg' and 'HorSeg' obstacles
+* Replaced `Rect` and `Circle` obstacles with `VertSeg` and `HorSeg` obstacles
 * Added wall collision
+* Switched from ray to segment for sight
 
 ### v0.1
 * 120x80 char screen resolution

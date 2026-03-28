@@ -25,13 +25,13 @@ internal class Camera
 	{
 		double bobbingY = Math.Sin(BobbingPhi) * 0.05;
 		var intersections = new List<(double, ScanIntersectionExtra)>(64);
-		var ray = new Geometry.Ray { originX = Player.X, originY = Player.Y };
+		var sight = new Geometry.Seg { x1 = Player.X, y1 = Player.Y };
 		for (int i = 0; i < ViewportWidth; i++)
 		{
 			double dir = (i - ViewportWidth / 2) * FovStep;
-			ray.dirX = Math.Cos(Player.Rot + dir);
-			ray.dirY = Math.Sin(Player.Rot + dir);
-			GetIntersectionsSortedByDist2UntilOpaque(ray, entities, intersections);
+			sight.x2 = sight.x1 + Math.Cos(Player.Rot + dir) * DepthCap;
+			sight.y2 = sight.y1 + Math.Sin(Player.Rot + dir) * DepthCap;
+			GetIntersectionsSortedByDist2UntilOpaque(sight, entities, intersections);
 			scanBuffer[i].Clear();
 			foreach ((double dist2, ScanIntersectionExtra extra) in intersections)
 			{
@@ -46,7 +46,7 @@ internal class Camera
 		}
 	}
 
-	private void GetIntersectionsSortedByDist2UntilOpaque(Geometry.Ray ray, Entities.IEnity[] entities,
+	private void GetIntersectionsSortedByDist2UntilOpaque(Geometry.Seg sight, Entities.IEnity[] entities,
 		List<(double, ScanIntersectionExtra)> intersections)
 	{
 		intersections.Clear();
@@ -55,7 +55,7 @@ internal class Camera
 		ScanIntersectionExtra minExtra = default;
 		foreach (Entities.IEnity enity in entities)
 		{
-			if (!enity.Intersect(ray, out var intersection)) continue;
+			if (!enity.Intersect(sight, out var intersection)) continue;
 			((double px, double py), ScanIntersectionExtra extra) = intersection;
 			double dx = Player.X - px, dy = Player.Y - py;
 			double dist2 = dx * dx + dy * dy;

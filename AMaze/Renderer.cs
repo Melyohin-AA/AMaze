@@ -18,31 +18,58 @@ internal class Renderer
 			Buffer[i] = new List<Line>();
 	}
 
+	//private long elapsedTicksV;
+	//private int elapsedTicksI;
+
 	public void Render()
 	{
 		//var sw = Stopwatch.StartNew();
+		var breakPoints = new List<int>(64);
 		for (short x = 0; x < ViewportWidth; x++)
 		{
 			var lines = Buffer[x];
-			for (short y = 0; y < ViewportHeight; y++)
+			breakPoints.Clear();
+			for (short i = 0; i < lines.Count; i++)
 			{
-				int lineSelected = -1;
-				for (short i = 0; i < lines.Count; i++)
+				Line line = lines[i];
+				if (line.top < ViewportHeight)
 				{
-					if ((y >= lines[i].top) && (y < lines[i].bottom))
-					{
-						lineSelected = i;
-						break;
-					}
+					breakPoints.Add(line.top);
+					if (line.bottom < ViewportHeight)
+						breakPoints.Add(line.bottom);
 				}
-				ConsoleUpdater.Color color = (lineSelected == -1) ? default : lines[lineSelected].color;
-				ConsoleUpdater.SetCell(x, y, '#', color);
+			}
+			breakPoints.Sort();
+			breakPoints.Add(ViewportHeight);
+			short y = 0;
+			for (byte j = 0; j < breakPoints.Count; j++)
+			{
+				int bp = breakPoints[j];
+				ConsoleUpdater.Color color = SelectLineColor(lines, y);
+				for (; y < bp; y++)
+					ConsoleUpdater.SetCell(x, y, '#', color);
 			}
 		}
-		//var e1 = sw.Elapsed;
+		//elapsedTicksV += sw.ElapsedTicks;
+		//elapsedTicksI++;
+		//var e1 = sw.ElapsedMilliseconds;
 		ConsoleUpdater.Flush();
-		//var e2 = sw.Elapsed - e1;
-		//Console.Title = $"{e1.Microseconds} | {e2.Microseconds}";
+		//var e2 = sw.ElapsedMilliseconds - e1;
+		//Console.Title = $"{elapsedTicksV / elapsedTicksI}";
+		//Console.Title = $"{e1} | {e2}";
+	}
+	private static ConsoleUpdater.Color SelectLineColor(List<Line> lines, short y)
+	{
+		int lineSelected = -1;
+		for (short i = 0; i < lines.Count; i++)
+		{
+			if ((y >= lines[i].top) && (y < lines[i].bottom))
+			{
+				lineSelected = i;
+				break;
+			}
+		}
+		return (lineSelected == -1) ? default : lines[lineSelected].color;
 	}
 
 	public struct Line

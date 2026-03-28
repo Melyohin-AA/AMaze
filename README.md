@@ -1,4 +1,4 @@
-# AMaze v0.7
+# AMaze v0.8
 
 This is a terminal 2.5D game about mazes.
 
@@ -10,13 +10,14 @@ Features we have:
 * 2 color palettes
 * 90 degrees FOV + fisheye
 * Layered rendering
-* ~~No overdraw~~ Yes overdraw
 * Camera bobbing
 * Real-time game cycle
 * Wall collision
 * Invisible walls and Ghost-walls
+* Doors and keys
 
 Features we don't have:
+* Sounds
 * Mazes
 * Points of interest
 * Challenges or goals
