@@ -86,7 +86,7 @@ internal class Renderer
 			return new Line {
 				top = ProjectNormHeight(top, viewportHeight),
 				bottom = ProjectNormHeight(bottom, viewportHeight),
-				color = GetColor((byte)Math.Round(brightness * MaxBrightness), extra.altPalette),
+				color = GetColor((byte)Math.Round(brightness * MaxBrightness), extra),
 			};
 		}
 		private static int ProjectNormHeight(double h, int viewportHeight)
@@ -94,11 +94,13 @@ internal class Renderer
 			double renormedHeight = 1.0 - (h + 1.0) / 2;
 			return (int)(renormedHeight * viewportHeight);
 		}
-		private static ConsoleUpdater.Color GetColor(byte br, bool altPalette)
+		private static ConsoleUpdater.Color GetColor(byte br, ScanIntersectionExtra extra)
 		{
+			if (extra.vantablack)
+				return default;
 			if (br > MaxBrightness)
 				throw new ArgumentOutOfRangeException(nameof(br));
-			int paletteBr = altPalette ? br + MaxBrightness + 2 : br;
+			int paletteBr = extra.altPalette ? br + MaxBrightness + 2 : br;
 			int bg = paletteBr >> 1, fg = (paletteBr + 1) >> 1;
 			return new ConsoleUpdater.Color((short)((bg << 4) | fg));
 		}

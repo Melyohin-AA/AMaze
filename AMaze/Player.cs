@@ -18,7 +18,7 @@ internal class Player
 		return new Geometry.Rect { x1 = x - HitboxHalf, y1 = y - HitboxHalf, x2 = x + HitboxHalf, y2 = y + HitboxHalf };
 	}
 
-	public void Move(double step, double rotOffset, Entities.IEnity[] entities)
+	public void Move(double step, double rotOffset, Span<Entities.IEntity> entities)
 	{
 		double dx = Math.Cos(Rot + rotOffset) * step;
 		double dy = Math.Sin(Rot + rotOffset) * step;
@@ -34,9 +34,9 @@ internal class Player
 			return;
 		}
 	}
-	private static bool DoesCollide(Geometry.Rect hitbox, Entities.IEnity[] entities)
+	private static bool DoesCollide(Geometry.Rect hitbox, Span<Entities.IEntity> entities)
 	{
-		foreach (Entities.IEnity enity in entities)
+		foreach (Entities.IEntity enity in entities)
 			if (enity.DoesCollide(hitbox))
 				return true;
 		return false;

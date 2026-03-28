@@ -1,3 +1,8 @@
+### v0.9
+* Added entity spawn/despawn system
+* Added hand lantern
+* Added always-black colouring mode
+
 ### v0.8
 * Optimized layered rendering
 * Switched from ray to segment for sight again

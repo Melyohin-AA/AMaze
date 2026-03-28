@@ -1,6 +1,6 @@
 ﻿namespace AMaze.Entities;
 
-internal class Grid : IEnity
+internal class Grid : IEntity
 {
 	public Geometry.IGeom Geom { get; }
 	public double Top { get; }

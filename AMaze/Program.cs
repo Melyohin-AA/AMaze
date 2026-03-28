@@ -17,7 +17,9 @@ internal class Program
 		while (true)
 		{
 			sw.Restart();
-			bool c = game.Tick();
+			bool c = game.TickPlayerControls();
+			game.TickLogic();
+			game.TickGraphics();
 			int frametime = (int)sw.ElapsedMilliseconds;
 			int left = targetPeriod - frametime;
 			if (left > possibleOversleepAmount)

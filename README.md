@@ -1,4 +1,4 @@
-# AMaze v0.8
+# AMaze v0.9
 
 This is a terminal 2.5D game about mazes.
 
@@ -15,6 +15,7 @@ Features we have:
 * Wall collision
 * Invisible walls and Ghost-walls
 * Doors and keys
+* Hand lantern
 
 Features we don't have:
 * Sounds
@@ -28,7 +29,8 @@ Supported platforms:
 Controls (press one key at a time):
 * W/A/S/D - movement
 * Q/E - camera rotation
+* V - fuel up the lantern
 
 Notes:
 * The recommended font is Raster Font 8x9 as the most rectangular of tiny fonts.
-* In legacy console mode, the "graphics" is about x1.5 times slower. Try it out.
+* In legacy console mode, the "graphics" is about 5 times slower. Try it out.

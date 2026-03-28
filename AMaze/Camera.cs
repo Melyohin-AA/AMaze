@@ -6,7 +6,7 @@ internal class Camera
 	public int ViewportWidth { get; }
 	public int ViewportHeight { get; }
 	public double FovStep { get; }
-	public double DepthCap { get; }
+	public double DepthCap { get; set; }
 	public double InnerDist { get; }
 
 	public double BobbingPhi { get; set; }
@@ -21,7 +21,7 @@ internal class Camera
 		InnerDist = innerDist;
 	}
 
-	public void Scan(Entities.IEnity[] entities, List<Renderer.Line>[] scanBuffer)
+	public void Scan(Span<Entities.IEntity> entities, List<Renderer.Line>[] scanBuffer)
 	{
 		double bobbingY = Math.Sin(BobbingPhi) * 0.05;
 		var intersections = new List<(double, ScanIntersectionExtra)>(64);
@@ -46,14 +46,14 @@ internal class Camera
 		}
 	}
 
-	private void GetIntersectionsSortedByDist2UntilOpaque(Geometry.Seg sight, Entities.IEnity[] entities,
+	private void GetIntersectionsSortedByDist2UntilOpaque(Geometry.Seg sight, Span<Entities.IEntity> entities,
 		List<(double, ScanIntersectionExtra)> intersections)
 	{
 		intersections.Clear();
 		bool allOpaque = true;
 		double minOpaqueDist2 = double.MaxValue;
 		ScanIntersectionExtra minExtra = default;
-		foreach (Entities.IEnity enity in entities)
+		foreach (Entities.IEntity enity in entities)
 		{
 			if (!enity.Intersect(sight, out var intersection)) continue;
 			((double px, double py), ScanIntersectionExtra extra) = intersection;

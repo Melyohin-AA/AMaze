@@ -1,6 +1,6 @@
 ﻿namespace AMaze.Entities;
 
-internal interface IEnity
+internal interface IEntity
 {
 	bool Intersect(Geometry.Seg sight, out ((double, double), ScanIntersectionExtra) intersection);
 
