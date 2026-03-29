@@ -1,3 +1,8 @@
+### v0.10
+* Added hand lantern flickering
+* Added warm colour palettes for lantern on state
+* Replaced console inputs with WinAPI key state checks
+
 ### v0.9
 * Added entity spawn/despawn system
 * Added hand lantern

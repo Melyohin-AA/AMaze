@@ -17,7 +17,12 @@ internal class Face : IGeom
 
 	public bool Intersect(Seg sight, out (double, double) intersection)
 	{
+		return Intersect(sight, out intersection, out _);
+	}
+	public bool Intersect(Seg sight, out (double, double) intersection, out double dist2)
+	{
 		intersection = default;
+		dist2 = double.NaN;
 		double sightVecX = sight.x2 - sight.x1, sightVecY = sight.y2 - sight.y1;
 		double projVecX = X - sight.x1, projVecY = Y - sight.y1;
 		double sightLen2 = sightVecX * sightVecX + sightVecY * sightVecY;
@@ -27,7 +32,7 @@ internal class Face : IGeom
 		double px = sight.x1 + t * sightVecX, py = sight.y1 + t * sightVecY;
 		intersection = (px, py);
 		double dx = px - X, dy = py - Y;
-		double dist2 = dx * dx + dy * dy;
+		dist2 = dx * dx + dy * dy;
 		return dist2 <= Radius2;
 	}
 

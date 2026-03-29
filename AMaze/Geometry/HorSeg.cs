@@ -30,11 +30,6 @@ internal class HorSeg : IGeom
 
 	public bool DoesIntersect(Rect rect)
 	{
-		//if ((Y < rect.y1) || (Y > rect.y2))
-		//	return false;
-		//if ((X + Length < rect.x1) || (X > rect.x2))
-		//	return false;
-		//return true;
 		return (Y >= rect.y1) && (Y <= rect.y2) && (X + Length >= rect.x1) && (X <= rect.x2);
 	}
 }

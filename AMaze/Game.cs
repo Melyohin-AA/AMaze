@@ -8,6 +8,7 @@ internal class Game
 	private readonly HashSet<Entities.IEntity> entitiesToDespawn;
 
 	public Renderer Renderer { get; }
+	public Keyboard Keyboard { get; }
 	public Player Player { get; }
 	public Camera Camera { get; }
 	public Lantern Lantern { get; }
@@ -20,9 +21,14 @@ internal class Game
 		entitiesToSpawn = new List<Entities.IEntity>();
 		entitiesToDespawn = new HashSet<Entities.IEntity>();
 		Renderer = new Renderer(viewportWidth, viewportHeight);
+		Keyboard = new Keyboard([
+			ConsoleKey.V,
+			ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D,
+			ConsoleKey.Q, ConsoleKey.E,
+		]);
 		Player = new Player(0.8);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, MaxCameraDepth, 2.0);
-		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.05);
+		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.02, 0.5, 0.1);
 		var key = new Entities.Key(-3, -6);
 		var door = new Entities.Wall(new Geometry.VertSeg(11, -1, 2), altPalette: true);
 		var keyhole = new Entities.Wall(new Geometry.VertSeg(10.9, -0.1, 0.2), top: 0.1, bottom: -0.1,
@@ -63,9 +69,10 @@ internal class Game
 	public bool TickPlayerControls()
 	{
 		const double speed = 0.1;
-		ConsoleKey key = default;
-		while (Console.KeyAvailable)
-			key = Console.ReadKey(true).Key;
+		ConsoleKey key = Keyboard.ReadKey();
+		//ConsoleKey key = default;
+		//while (Console.KeyAvailable)
+		//	key = Console.ReadKey(true).Key;
 		bool moved = false;
 		switch (key)
 		{

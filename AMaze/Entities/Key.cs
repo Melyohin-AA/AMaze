@@ -2,20 +2,23 @@
 
 internal class Key : IEntity
 {
-	public Geometry.IGeom Geom { get; }
+	private readonly Geometry.Face face;
 
 	public event Action<Key>? PickupCallback;
 
 	public Key(double x, double y)
 	{
-		Geom = new Geometry.Face(x, y, 0.25);
+		face = new Geometry.Face(x, y, 0.5);
 	}
 
-	public bool Intersect(Geometry.Seg ray, out ((double, double), ScanIntersectionExtra) intersection)
+	public bool Intersect(Geometry.Seg sight, out ((double, double), ScanIntersectionExtra) intersection)
 	{
-		if (Geom.Intersect(ray, out var point))
+		if (face.Intersect(sight, out var point, out double dist2))
 		{
-			var extra = new ScanIntersectionExtra { top = -0.5, bottom = -1.0, altPalette = true };
+			double dist = Math.Sqrt(dist2);
+			var extra = new ScanIntersectionExtra {
+				top = face.Radius - dist - 1, bottom = dist - 1, altPalette = true,
+			};
 			intersection = (point, extra);
 			return true;
 		}
@@ -25,7 +28,7 @@ internal class Key : IEntity
 
 	public bool DoesCollide(Geometry.Rect rect)
 	{
-		if (Geom.DoesIntersect(rect))
+		if (face.DoesIntersect(rect))
 			PickupCallback?.Invoke(this);
 		return false;
 	}

@@ -2,26 +2,41 @@
 
 internal class Lantern
 {
-	public Camera Camera { get; }
-	public double MaxDepth { get; }
-	public double MinDepth { get; }
-	public double DepthReductionSpeed { get; }
+	private readonly Camera camera;
+	private readonly double maxDepth, minDepth;
+	private readonly double depthReductionSpeed, fuelingSpeed;
+	private readonly double flicker;
+	private readonly Random rng;
 
-	public Lantern(Camera camera, double maxDepth, double minDepth, double depthReductionSpeed)
+	private double currentDepth;
+	private bool wasWarm;
+
+	private bool IsWarm => currentDepth > minDepth;
+
+	public Lantern(Camera camera, double maxDepth, double minDepth, double depthReductionSpeed, double fuelingSpeed,
+		double flicker)
 	{
-		Camera = camera;
-		MaxDepth = maxDepth;
-		MinDepth = minDepth;
-		DepthReductionSpeed = depthReductionSpeed;
+		this.camera = camera;
+		this.maxDepth = currentDepth = maxDepth;
+		this.minDepth = minDepth;
+		this.depthReductionSpeed = depthReductionSpeed;
+		this.fuelingSpeed = fuelingSpeed;
+		this.flicker = flicker;
+		rng = new Random();
 	}
 
 	public void Tick()
 	{
-		Camera.DepthCap = Math.Max(Camera.DepthCap - DepthReductionSpeed, MinDepth);
+		camera.DepthCap = currentDepth = Math.Max(currentDepth - depthReductionSpeed, minDepth);
+		if (IsWarm)
+			camera.DepthCap += (rng.NextDouble() - 0.5) * flicker;
+		if (wasWarm != IsWarm)
+			PaletteManager.Set(IsWarm);
+		wasWarm = IsWarm;
 	}
 
 	public void FuelUp()
 	{
-		Camera.DepthCap = Math.Min(Camera.DepthCap + 1.0, MaxDepth);
+		currentDepth = Math.Min(currentDepth + fuelingSpeed, maxDepth);
 	}
 }

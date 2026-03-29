@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 
 namespace AMaze;
 
@@ -8,10 +7,9 @@ internal class Program
 	static void Main()
 	{
 		const int vph = 120, vpw = vph * 3 / 2;
-		const int targetPeriod = 40, possibleOversleepAmount = 16;
+		const int targetPeriod = 33, possibleOversleepAmount = 16;
 		Console.Title = "AMaze";
 		ConfigureViewport(vpw, vph);
-		ApplyPalette();
 		var game = new Game(vpw, vph);
 		var sw = new Stopwatch();
 		while (true)
@@ -52,19 +50,5 @@ internal class Program
 		}
 		Console.Clear();
 		Console.CursorVisible = false;
-	}
-
-	private static void ApplyPalette(byte light = 34)
-	{
-		if (light > 34)
-			throw new ArgumentOutOfRangeException(nameof(light));
-		var colors = new Color[16];
-		for (int i = 0; i < 8; i++)
-		{
-			int brightness = i * light;
-			colors[i] = Color.FromArgb(brightness, brightness, brightness);
-			colors[i + 8] = Color.FromArgb(brightness, 0, 0);
-		}
-		Recolorer.Recolor(colors);
 	}
 }

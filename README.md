@@ -1,4 +1,4 @@
-# AMaze v0.9
+# AMaze v0.10
 
 This is a terminal 2.5D game about mazes.
 
@@ -10,7 +10,7 @@ Features we have:
 * 2 color palettes
 * 90 degrees FOV + fisheye
 * Layered rendering
-* Camera bobbing
+* One-key-at-a-time controls
 * Real-time game cycle
 * Wall collision
 * Invisible walls and Ghost-walls
@@ -26,7 +26,7 @@ Features we don't have:
 Supported platforms:
 * Windows :(
 
-Controls (press one key at a time):
+Controls:
 * W/A/S/D - movement
 * Q/E - camera rotation
 * V - fuel up the lantern
