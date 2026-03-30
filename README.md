@@ -1,4 +1,4 @@
-# AMaze v0.10
+# AMaze v0.11
 
 This is a terminal 2.5D game about mazes.
 
@@ -18,7 +18,6 @@ Features we have:
 * Hand lantern
 
 Features we don't have:
-* Sounds
 * Mazes
 * Points of interest
 * Challenges or goals

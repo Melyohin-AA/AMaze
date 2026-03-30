@@ -82,7 +82,7 @@ internal class Renderer
 		public static Line FromNative(int viewportHeight,
 			double top, double bottom, double brightness, ScanIntersectionExtra extra)
 		{
-			brightness = Math.Min(1.0, Math.Max(0.0, brightness));
+			brightness = Math.Clamp(brightness, 0.0, 1.0);
 			return new Line {
 				top = ProjectNormHeight(top, viewportHeight),
 				bottom = ProjectNormHeight(bottom, viewportHeight),

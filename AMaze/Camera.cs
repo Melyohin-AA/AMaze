@@ -8,7 +8,6 @@ internal class Camera
 	public double FovStep { get; }
 	public double DepthCap { get; set; }
 	public double InnerDist { get; }
-
 	public double BobbingPhi { get; set; }
 
 	public Camera(Player player, int viewportWidth, int viewportHeight, double fov, double depthCap, double innerDist)

@@ -1,3 +1,7 @@
+### v0.11
+* Added sound system
+* Added player step sound
+
 ### v0.10
 * Added hand lantern flickering
 * Added warm colour palettes for lantern on state

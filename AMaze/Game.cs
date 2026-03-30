@@ -1,6 +1,6 @@
 ﻿namespace AMaze;
 
-internal class Game
+internal class Game : IDisposable
 {
 	private const double MaxCameraDepth = 20.0;
 
@@ -9,6 +9,7 @@ internal class Game
 
 	public Renderer Renderer { get; }
 	public Keyboard Keyboard { get; }
+	public Sound.StereoPlayer StereoPlayer { get; }
 	public Player Player { get; }
 	public Camera Camera { get; }
 	public Lantern Lantern { get; }
@@ -26,6 +27,7 @@ internal class Game
 			ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D,
 			ConsoleKey.Q, ConsoleKey.E,
 		]);
+		StereoPlayer = new Sound.StereoPlayer();
 		Player = new Player(0.8);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, MaxCameraDepth, 2.0);
 		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.02, 0.5, 0.1);
@@ -63,6 +65,12 @@ internal class Game
 		};
 	}
 
+	~Game() => Dispose();
+	public void Dispose()
+	{
+		StereoPlayer.Dispose();
+	}
+
 	public void SpawnEntity(Entities.IEntity enity) => entitiesToSpawn.Add(enity);
 	public void DespawnEntity(Entities.IEntity enity) => entitiesToDespawn.Add(enity);
 
@@ -73,24 +81,28 @@ internal class Game
 		//ConsoleKey key = default;
 		//while (Console.KeyAvailable)
 		//	key = Console.ReadKey(true).Key;
-		bool moved = false;
+		bool moved = false, startingWithLeftLeg = false;
 		switch (key)
 		{
 			case ConsoleKey.W:
 				Player.Move(speed, 0.0, EntitiesSpan);
 				moved = true;
+				startingWithLeftLeg = true;
 				break;
 			case ConsoleKey.S:
 				Player.Move(-speed, 0.0, EntitiesSpan);
 				moved = true;
+				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.A:
 				Player.Move(-speed, Math.PI / 2, EntitiesSpan);
 				moved = true;
+				startingWithLeftLeg = true;
 				break;
 			case ConsoleKey.D:
 				Player.Move(speed, Math.PI / 2, EntitiesSpan);
 				moved = true;
+				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.Q:
 				Player.Rotate(-Camera.FovStep * 5);
@@ -103,9 +115,25 @@ internal class Game
 				break;
 		}
 		if (moved)
-			Camera.BobbingPhi += 0.3;
+			BobCamera(startingWithLeftLeg);
 		else Camera.BobbingPhi = 0.0;
 		return key != ConsoleKey.None;
+	}
+	private void BobCamera(bool startingWithLeftLeg)
+	{
+		double stepSine0 = CalcStepSine(startingWithLeftLeg);
+		Camera.BobbingPhi += 0.3;
+		double stepSine1 = CalcStepSine(startingWithLeftLeg);
+		if ((stepSine0 > 0.0) != (stepSine1 > 0.0))
+		{
+			(float lv, float rv) = (stepSine1 > 0.0) ? (0.4f, 0.5f) : (0.5f, 0.4f);
+			StereoPlayer.PanAndPlay("step", lv, rv);
+		}
+	}
+	private double CalcStepSine(bool startingWithLeftLeg)
+	{
+		double x = Camera.BobbingPhi / 2.0 + 1.2;
+		return Math.Cos(startingWithLeftLeg ? x : x + Math.PI);
 	}
 
 	public void TickLogic()
