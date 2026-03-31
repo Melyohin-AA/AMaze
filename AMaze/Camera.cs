@@ -23,7 +23,7 @@ internal class Camera
 	public void Scan(Span<Entities.IEntity> entities, List<Renderer.Line>[] scanBuffer)
 	{
 		double bobbingY = Math.Sin(BobbingPhi) * 0.05;
-		var intersections = new List<(double, ScanIntersectionExtra)>(64);
+		var intersections = new List<ScanIntersection>(64);
 		var sight = new Geometry.Seg { x1 = Player.X, y1 = Player.Y };
 		for (int i = 0; i < ViewportWidth; i++)
 		{
@@ -32,47 +32,41 @@ internal class Camera
 			sight.y2 = sight.y1 + Math.Sin(Player.Rot + dir) * DepthCap;
 			GetIntersectionsSortedByDist2UntilOpaque(sight, entities, intersections);
 			scanBuffer[i].Clear();
-			foreach ((double dist2, ScanIntersectionExtra extra) in intersections)
+			foreach (ScanIntersection inter in intersections)
 			{
-				double dist = Math.Sqrt(dist2);
-				double screenedTop = extra.top * InnerDist / dist + bobbingY;
-				double screenedBottom = extra.bottom * InnerDist / dist + bobbingY;
+				double dist = Math.Sqrt(inter.dist2);
+				inter.Screen(InnerDist, dist, bobbingY);
 				double brightness = 1.0 - dist / DepthCap;
-				var line = Renderer.Line.FromNative(ViewportHeight, screenedTop, screenedBottom, brightness, extra);
+				var line = Renderer.Line.FromNative(ViewportHeight, brightness, inter);
 				scanBuffer[i].Add(line);
-				if (extra.opaque) break;
+				if (inter.opaque) break;
 			}
 		}
 	}
 
 	private void GetIntersectionsSortedByDist2UntilOpaque(Geometry.Seg sight, Span<Entities.IEntity> entities,
-		List<(double, ScanIntersectionExtra)> intersections)
+		List<ScanIntersection> intersections)
 	{
 		intersections.Clear();
 		bool allOpaque = true;
-		double minOpaqueDist2 = double.MaxValue;
-		ScanIntersectionExtra minExtra = default;
+		var minOpaqueInter = new ScanIntersection { dist2 = double.MaxValue, opaque = true };
 		foreach (Entities.IEntity enity in entities)
 		{
-			if (!enity.Intersect(sight, out var intersection)) continue;
-			((double px, double py), ScanIntersectionExtra extra) = intersection;
-			double dx = Player.X - px, dy = Player.Y - py;
-			double dist2 = dx * dx + dy * dy;
-			intersections.Add((dist2, extra));
-			allOpaque = allOpaque && extra.opaque;
-			if (extra.opaque && (minOpaqueDist2 > dist2))
-			{
-				minOpaqueDist2 = dist2;
-				minExtra = extra;
-			}
+			if (!enity.Intersect(sight, out var inter)) continue;
+			double dx = Player.X - inter.x, dy = Player.Y - inter.y;
+			inter.dist2 = dx * dx + dy * dy;
+			intersections.Add(inter);
+			allOpaque = allOpaque && inter.opaque;
+			if (inter.opaque && (minOpaqueInter.dist2 > inter.dist2))
+				minOpaqueInter = inter;
 		}
 		if (allOpaque)
 		{
 			intersections.Clear();
-			intersections.Add((minOpaqueDist2, minExtra));
+			intersections.Add(minOpaqueInter);
 			return;
 		}
-		intersections.RemoveAll(item => item.Item1 > minOpaqueDist2);
-		intersections.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+		intersections.RemoveAll(inter => inter.dist2 > minOpaqueInter.dist2);
+		intersections.Sort((a, b) => a.dist2.CompareTo(b.dist2));
 	}
 }

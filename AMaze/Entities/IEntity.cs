@@ -2,7 +2,7 @@
 
 internal interface IEntity
 {
-	bool Intersect(Geometry.Seg sight, out ((double, double), ScanIntersectionExtra) intersection);
+	bool Intersect(Geometry.Seg sight, out ScanIntersection intersection);
 
 	bool DoesCollide(Geometry.Rect rect);
 }

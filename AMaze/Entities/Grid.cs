@@ -18,15 +18,16 @@ internal class Grid : IEntity
 		Threshold = threshold;
 	}
 
-	public bool Intersect(Geometry.Seg ray, out ((double, double), ScanIntersectionExtra) intersection)
+	public bool Intersect(Geometry.Seg ray, out ScanIntersection intersection)
 	{
-		if (Geom.Intersect(ray, out var point))
+		if (Geom.Intersect(ray, out intersection))
 		{
-			double phase = (point.Item1 + point.Item2) * PhaseMult;
+			double phase = (intersection.x + intersection.y) * PhaseMult;
 			if (phase - Math.Truncate(phase) < Threshold)
 			{
-				var extra = new ScanIntersectionExtra { top = Top, bottom = Bottom, opaque = true };
-				intersection = (point, extra);
+				intersection.top = Top;
+				intersection.opaque = true;
+				intersection.headSec.bottom = Bottom;
 				return true;
 			}
 		}

@@ -2,7 +2,7 @@
 
 internal interface IGeom
 {
-	bool Intersect(Seg sight, out (double, double) intersection);
+	bool Intersect(Seg sight, out ScanIntersection intersection);
 
 	bool DoesIntersect(Rect rect);
 }

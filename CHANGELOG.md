@@ -1,3 +1,7 @@
+### v0.12
+* Added multi-section intersection mode
+* Added `Door` and `Pillor` entities
+
 ### v0.11
 * Added sound system
 * Added player step sound

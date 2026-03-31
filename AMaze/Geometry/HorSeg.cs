@@ -13,7 +13,7 @@ internal class HorSeg : IGeom
 		Length = length;
 	}
 
-	public bool Intersect(Seg sight, out (double, double) intersection)
+	public bool Intersect(Seg sight, out ScanIntersection intersection)
 	{
 		intersection = default;
 		if (sight.y1 == sight.y2)
@@ -24,7 +24,7 @@ internal class HorSeg : IGeom
 		double x = sight.x1 + t * (sight.x2 - sight.x1);
 		if ((x < X) || (x > X + Length))
 			return false;
-		intersection = (x, Y);
+		intersection = new ScanIntersection { x = x, y = Y };
 		return true;
 	}
 

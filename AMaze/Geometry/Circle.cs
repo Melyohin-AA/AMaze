@@ -13,7 +13,7 @@ internal class Circle : IGeom
 		Radius = radius;
 	}
 
-	public bool Intersect(Seg ray, out (double, double) intersection)
+	public bool Intersect(Seg ray, out ScanIntersection intersection)
 	{
 		intersection = default;
 		double dx = ray.x1 - X, dy = ray.y1 - Y;
@@ -28,7 +28,7 @@ internal class Circle : IGeom
 		if ((t1 < 0.0) && (t2 < 0.0)) return false;
 		// Returning only one of two solutions
 		double t = (t1 >= 0.0) ? t1 : t2;
-		intersection = (ray.x1 + t * ray.x2, ray.y1 + t * ray.y2);
+		intersection = new ScanIntersection { x = ray.x1 + t * ray.x2, y = ray.y1 + t * ray.y2 };
 		return true;
 	}
 

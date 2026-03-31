@@ -30,15 +30,7 @@ internal class Renderer
 			var lines = Buffer[x];
 			breakPoints.Clear();
 			for (short i = 0; i < lines.Count; i++)
-			{
-				Line line = lines[i];
-				if (line.top < ViewportHeight)
-				{
-					breakPoints.Add(line.top);
-					if (line.bottom < ViewportHeight)
-						breakPoints.Add(line.bottom);
-				}
-			}
+				lines[i].AddHeights(ViewportHeight, breakPoints);
 			breakPoints.Sort();
 			breakPoints.Add(ViewportHeight);
 			short y = 0;
@@ -60,49 +52,93 @@ internal class Renderer
 	}
 	private static ConsoleUpdater.Color SelectLineColor(List<Line> lines, short y)
 	{
-		int lineSelected = -1;
-		for (short i = 0; i < lines.Count; i++)
+		for (int i = 0; i < lines.Count; i++)
 		{
-			if ((y >= lines[i].top) && (y < lines[i].bottom))
+			Line line = lines[i];
+			if (y >= line.top)
 			{
-				lineSelected = i;
-				break;
+				if (y < line.headSec.bottom)
+					return line.headSec.color;
+				if (line.extraSecs != null)
+					for (int j = 0; j < line.extraSecs.Length; j++)
+						if (y < line.extraSecs[j].bottom)
+							return line.extraSecs[j].color;
 			}
 		}
-		return (lineSelected == -1) ? default : lines[lineSelected].color;
+		return default;
+	}
+
+	private static int ProjectNormHeight(double h, int viewportHeight)
+	{
+		double renormedHeight = 1.0 - (h + 1.0) / 2;
+		return (int)(renormedHeight * viewportHeight);
 	}
 
 	public struct Line
 	{
-		public const byte MaxBrightness = 14;
+		public int top;
+		public LineSection headSec;
+		public LineSection[]? extraSecs;
 
-		public int top, bottom;
-		public ConsoleUpdater.Color color;
-
-		public static Line FromNative(int viewportHeight,
-			double top, double bottom, double brightness, ScanIntersectionExtra extra)
+		public static Line FromNative(int viewportHeight, double brightness, ScanIntersection inter)
 		{
 			brightness = Math.Clamp(brightness, 0.0, 1.0);
-			return new Line {
-				top = ProjectNormHeight(top, viewportHeight),
-				bottom = ProjectNormHeight(bottom, viewportHeight),
-				color = GetColor((byte)Math.Round(brightness * MaxBrightness), extra),
+			var line = new Line {
+				top = ProjectNormHeight(inter.top, viewportHeight),
+				headSec = LineSection.FromNative(viewportHeight, brightness, inter.headSec),
+			};
+			if (inter.extraSecs != null)
+			{
+				line.extraSecs = new LineSection[inter.extraSecs.Length];
+				for (int i = 0; i < line.extraSecs.Length; i++)
+					line.extraSecs[i] = LineSection.FromNative(viewportHeight, brightness, inter.extraSecs[i]);
+			}
+			return line;
+		}
+
+		public void AddHeights(int viewportHeight, List<int> heights)
+		{
+			if (top < viewportHeight)
+			{
+				heights.Add(top);
+				headSec.AddHeights(viewportHeight, heights);
+				if (extraSecs != null)
+					for (int i = 0; i < extraSecs.Length; i++)
+						extraSecs[i].AddHeights(viewportHeight, heights);
+			}
+		}
+	}
+
+	public struct LineSection
+	{
+		public const byte MaxBrightness = 14;
+
+		public int bottom;
+		public ConsoleUpdater.Color color;
+
+		public static LineSection FromNative(
+			int viewportHeight, double brightness, ScanIntersectionSection interSec)
+		{
+			return new LineSection {
+				bottom = ProjectNormHeight(interSec.bottom, viewportHeight),
+				color = GetColor((byte)Math.Round(brightness * MaxBrightness), interSec),
 			};
 		}
-		private static int ProjectNormHeight(double h, int viewportHeight)
+		private static ConsoleUpdater.Color GetColor(byte br, ScanIntersectionSection interSec)
 		{
-			double renormedHeight = 1.0 - (h + 1.0) / 2;
-			return (int)(renormedHeight * viewportHeight);
-		}
-		private static ConsoleUpdater.Color GetColor(byte br, ScanIntersectionExtra extra)
-		{
-			if (extra.vantablack)
+			if (interSec.vantablack)
 				return default;
 			if (br > MaxBrightness)
 				throw new ArgumentOutOfRangeException(nameof(br));
-			int paletteBr = extra.altPalette ? br + MaxBrightness + 2 : br;
+			int paletteBr = interSec.altPalette ? br + MaxBrightness + 2 : br;
 			int bg = paletteBr >> 1, fg = (paletteBr + 1) >> 1;
 			return new ConsoleUpdater.Color((short)((bg << 4) | fg));
+		}
+
+		public void AddHeights(int viewportHeight, List<int> heights)
+		{
+			if (bottom < viewportHeight)
+				heights.Add(bottom);
 		}
 	}
 }

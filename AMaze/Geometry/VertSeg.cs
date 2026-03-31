@@ -13,7 +13,7 @@ internal class VertSeg : IGeom
 		Length = length;
 	}
 
-	public bool Intersect(Seg sight, out (double, double) intersection)
+	public bool Intersect(Seg sight, out ScanIntersection intersection)
 	{
 		intersection = default;
 		if (sight.x1 == sight.x2)
@@ -24,7 +24,7 @@ internal class VertSeg : IGeom
 		double y = sight.y1 + t * (sight.y2 - sight.y1);
 		if ((y < Y) || (y > Y + Length))
 			return false;
-		intersection = (X, y);
+		intersection = new ScanIntersection { x = X, y = y };
 		return true;
 	}
 

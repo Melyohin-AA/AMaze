@@ -24,14 +24,15 @@ internal class Wall : IEntity
 		Vantablack = vantablack;
 	}
 
-	public bool Intersect(Geometry.Seg ray, out ((double, double), ScanIntersectionExtra) intersection)
+	public bool Intersect(Geometry.Seg sight, out ScanIntersection intersection)
 	{
-		if (IsVisible && Geom.Intersect(ray, out var point))
+		if (IsVisible && Geom.Intersect(sight, out intersection))
 		{
-			var extra = new ScanIntersectionExtra {
-				top = Top, bottom = Bottom, opaque = Opaque, altPalette = AltPalette, vantablack = Vantablack,
+			intersection.top = Top;
+			intersection.opaque = Opaque;
+			intersection.headSec = new ScanIntersectionSection {
+				bottom = Bottom, altPalette = AltPalette, vantablack = Vantablack,
 			};
-			intersection = (point, extra);
 			return true;
 		}
 		intersection = default;

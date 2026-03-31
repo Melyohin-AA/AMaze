@@ -1,4 +1,7 @@
-﻿namespace AMaze;
+﻿using AMaze.Entities;
+using AMaze.Geometry;
+
+namespace AMaze;
 
 internal class Game : IDisposable
 {
@@ -13,14 +16,14 @@ internal class Game : IDisposable
 	public Player Player { get; }
 	public Camera Camera { get; }
 	public Lantern Lantern { get; }
-	public List<Entities.IEntity> Entities { get; private set; }
+	public List<IEntity> Entities { get; private set; }
 
-	public Span<Entities.IEntity> EntitiesSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(Entities);
+	public Span<IEntity> EntitiesSpan => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(Entities);
 
 	public Game(int viewportWidth, int viewportHeight)
 	{
-		entitiesToSpawn = new List<Entities.IEntity>();
-		entitiesToDespawn = new HashSet<Entities.IEntity>();
+		entitiesToSpawn = new List<IEntity>();
+		entitiesToDespawn = new HashSet<IEntity>();
 		Renderer = new Renderer(viewportWidth, viewportHeight);
 		Keyboard = new Keyboard([
 			ConsoleKey.V,
@@ -31,37 +34,34 @@ internal class Game : IDisposable
 		Player = new Player(0.8);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, MaxCameraDepth, 2.0);
 		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.02, 0.5, 0.1);
-		var key = new Entities.Key(-3, -6);
-		var door = new Entities.Wall(new Geometry.VertSeg(11, -1, 2), altPalette: true);
-		var keyhole = new Entities.Wall(new Geometry.VertSeg(10.9, -0.1, 0.2), top: 0.1, bottom: -0.1,
-			opaque: false, vantablack: true);
+		var key = new Key(-3, -6);
+		var door = new Door((11, 0), 2, Orientation.NegX);
 		key.PickupCallback += key => {
 			DespawnEntity(key);
 			DespawnEntity(door);
-			DespawnEntity(keyhole);
 		};
-		Entities = new List<Entities.IEntity> {
+		Entities = new List<IEntity> {
 			// Left and right walls
-			new Entities.Wall(new Geometry.HorSeg(-10, -10, 20)),
-			new Entities.Wall(new Geometry.HorSeg(-10, 10, 20)),
+			new Wall(new HorSeg(-10, -10, 20)),
+			new Wall(new HorSeg(-10, 10, 20)),
 			// Front wall and doorway
-			new Entities.Wall(new Geometry.VertSeg(10, -10, 9)),
-			new Entities.Wall(new Geometry.HorSeg(10, -1, 1)),
-			new Entities.Wall(new Geometry.VertSeg(10, -1, 2), bottom: 0.8, isGhost: true, opaque: false),
-			new Entities.Wall(new Geometry.HorSeg(10, 1, 1)),
-			new Entities.Wall(new Geometry.VertSeg(10, 1, 9)),
+			new Wall(new VertSeg(10, -10, 9)),
+			new Wall(new HorSeg(10, -1, 1)),
+			new Wall(new VertSeg(10, -1, 2), bottom: 0.8, isGhost: true, opaque: false),
+			new Wall(new HorSeg(10, 1, 1)),
+			new Wall(new VertSeg(10, 1, 9)),
 			// Invisible back wall
-			new Entities.Wall(new Geometry.VertSeg(-10, -10, 20), isVisible: false),
+			new Wall(new VertSeg(-10, -10, 20), isVisible: false),
 			// Mid grid wall
-			new Entities.Wall(new Geometry.VertSeg(8, -3, 6), bottom: 0.8, opaque: false),
-			new Entities.Wall(new Geometry.VertSeg(8, -3, 6), top: -0.8, opaque: false),
-			new Entities.Grid(new Geometry.VertSeg(8, -3, 6), top: 0.8, bottom: -0.8),
-			new Entities.Wall(new Geometry.VertSeg(8, -8, 5)),
-			new Entities.Wall(new Geometry.VertSeg(8, 3, 5)),
+			new Wall(new VertSeg(8, -3, 6), bottom: 0.8, opaque: false),
+			new Wall(new VertSeg(8, -3, 6), top: -0.8, opaque: false),
+			new Grid(new VertSeg(8, -3, 6), top: 0.8, bottom: -0.8),
+			new Wall(new VertSeg(8, -8, 5)),
+			new Wall(new VertSeg(8, 3, 5)),
 			// Door and key
 			door,
 			key,
-			keyhole,
+			new Pillar(-3, -6, -0.3),
 		};
 	}
 
@@ -71,16 +71,13 @@ internal class Game : IDisposable
 		StereoPlayer.Dispose();
 	}
 
-	public void SpawnEntity(Entities.IEntity enity) => entitiesToSpawn.Add(enity);
-	public void DespawnEntity(Entities.IEntity enity) => entitiesToDespawn.Add(enity);
+	public void SpawnEntity(IEntity enity) => entitiesToSpawn.Add(enity);
+	public void DespawnEntity(IEntity enity) => entitiesToDespawn.Add(enity);
 
 	public bool TickPlayerControls()
 	{
 		const double speed = 0.1;
 		ConsoleKey key = Keyboard.ReadKey();
-		//ConsoleKey key = default;
-		//while (Console.KeyAvailable)
-		//	key = Console.ReadKey(true).Key;
 		bool moved = false, startingWithLeftLeg = false;
 		switch (key)
 		{

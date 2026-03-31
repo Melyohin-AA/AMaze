@@ -8,18 +8,16 @@ internal class Key : IEntity
 
 	public Key(double x, double y)
 	{
-		face = new Geometry.Face(x, y, 0.5);
+		face = new Geometry.Face(x, y, 0.25, 0.5);
 	}
 
-	public bool Intersect(Geometry.Seg sight, out ((double, double), ScanIntersectionExtra) intersection)
+	public bool Intersect(Geometry.Seg sight, out ScanIntersection intersection)
 	{
-		if (face.Intersect(sight, out var point, out double dist2))
+		if (face.Intersect(sight, out intersection, out double dist2))
 		{
 			double dist = Math.Sqrt(dist2);
-			var extra = new ScanIntersectionExtra {
-				top = face.Radius - dist - 1, bottom = dist - 1, altPalette = true,
-			};
-			intersection = (point, extra);
+			intersection.top = face.VisRadius - dist;
+			intersection.headSec = new ScanIntersectionSection { bottom = dist - face.VisRadius, altPalette = true };
 			return true;
 		}
 		intersection = default;
