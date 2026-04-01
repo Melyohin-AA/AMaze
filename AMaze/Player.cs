@@ -3,14 +3,17 @@
 internal class Player
 {
 	public double HitboxHalf { get; }
+	public double InteractionDist { get; }
 
 	public double X { get; set; }
 	public double Y { get; set; }
 	public double Rot { get; set; }
+	public int KeyCount { get; set; }
 
-	public Player(double hitboxSize)
+	public Player(double hitboxSize, double interactionDist)
 	{
 		HitboxHalf = hitboxSize / 2.0;
+		InteractionDist = interactionDist;
 	}
 
 	private Geometry.Rect MakeHitbox(double x, double y)
@@ -36,8 +39,8 @@ internal class Player
 	}
 	private static bool DoesCollide(Geometry.Rect hitbox, Span<Entities.IEntity> entities)
 	{
-		foreach (Entities.IEntity enity in entities)
-			if (enity.DoesCollide(hitbox))
+		foreach (Entities.IEntity entity in entities)
+			if (entity.DoesCollide(hitbox))
 				return true;
 		return false;
 	}
@@ -49,5 +52,19 @@ internal class Player
 			Rot -= Math.PI * 2;
 		else if (Rot < -Math.PI * 2)
 			Rot += Math.PI * 2;
+	}
+
+	public void Interact(Span<Entities.IEntity> entities)
+	{
+		var seg = new Geometry.Seg {
+			x1 = X,
+			y1 = Y,
+			x2 = X + Math.Cos(Rot) * InteractionDist,
+			y2 = Y + Math.Sin(Rot) * InteractionDist,
+		};
+		foreach (Entities.IEntity entity in entities)
+			if (entity is Entities.IInteractable interactable)
+				if (entity.Intersect(seg, out var _))
+					interactable.Interact();
 	}
 }

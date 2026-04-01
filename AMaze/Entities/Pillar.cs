@@ -7,7 +7,7 @@ internal class Pillar : IEntity
 
 	public Pillar(double x, double y, double top)
 	{
-		face = new Geometry.Face(x, y, 0.3, 0.3);
+		face = new Geometry.Face(x, y, 0.3);
 		this.top = top;
 	}
 

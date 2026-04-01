@@ -6,3 +6,13 @@ internal interface IEntity
 
 	bool DoesCollide(Geometry.Rect rect);
 }
+
+internal interface IInteractable
+{
+	void Interact();
+}
+
+internal interface IDynamic
+{
+	void Tick();
+}

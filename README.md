@@ -1,4 +1,4 @@
-# AMaze v0.12
+# AMaze v0.12.1
 
 This is a terminal 2.5D game about mazes.
 
@@ -29,6 +29,7 @@ Controls:
 * W/A/S/D - movement
 * Q/E - camera rotation
 * V - fuel up the lantern
+* C - interact
 
 Notes:
 * The recommended font is Raster Font 8x9 as the most rectangular of tiny fonts.

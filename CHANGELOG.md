@@ -1,3 +1,7 @@
+### v0.12.1
+* Added support entity interacting
+* Proper key-door logic + door opening animation
+
 ### v0.12
 * Added multi-section intersection mode
 * Added `Door` and `Pillor` entities

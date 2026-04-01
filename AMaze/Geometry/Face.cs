@@ -4,19 +4,15 @@ internal class Face : IGeom
 {
 	public double X { get; }
 	public double Y { get; }
-	public double VisRadius { get; }
-	public double VisRadius2 { get; }
-	public double HitRadius { get; }
-	public double HitRadius2 { get; }
+	public double Radius { get; }
+	public double Radius2 { get; }
 
-	public Face(double x, double y, double visRadius, double hitRadius)
+	public Face(double x, double y, double radius)
 	{
 		X = x;
 		Y = y;
-		VisRadius = visRadius;
-		VisRadius2 = visRadius * visRadius;
-		HitRadius = hitRadius;
-		HitRadius2 = hitRadius * hitRadius;
+		Radius = radius;
+		Radius2 = radius * radius;
 	}
 
 	public bool Intersect(Seg sight, out ScanIntersection intersection)
@@ -36,7 +32,7 @@ internal class Face : IGeom
 		intersection = new ScanIntersection { x = sight.x1 + t * sightVecX, y = sight.y1 + t * sightVecY };
 		double dx = intersection.x - X, dy = intersection.y - Y;
 		dist2 = dx * dx + dy * dy;
-		return dist2 <= VisRadius2;
+		return dist2 <= Radius2;
 	}
 
 	public bool DoesIntersect(Rect rect)
@@ -44,6 +40,6 @@ internal class Face : IGeom
 		// This is very simplified
 		double dx = (rect.x1 + rect.x2) / 2.0 - X, dy = (rect.y1 + rect.y2) / 2.0 - Y;
 		double dist2 = dx * dx + dy * dy;
-		return dist2 <= HitRadius2;
+		return dist2 <= Radius2;
 	}
 }

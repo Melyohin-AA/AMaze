@@ -7,8 +7,8 @@ internal class Game : IDisposable
 {
 	private const double MaxCameraDepth = 20.0;
 
-	private readonly List<Entities.IEntity> entitiesToSpawn;
-	private readonly HashSet<Entities.IEntity> entitiesToDespawn;
+	private readonly List<IEntity> entitiesToSpawn;
+	private readonly HashSet<IEntity> entitiesToDespawn;
 
 	public Renderer Renderer { get; }
 	public Keyboard Keyboard { get; }
@@ -26,20 +26,16 @@ internal class Game : IDisposable
 		entitiesToDespawn = new HashSet<IEntity>();
 		Renderer = new Renderer(viewportWidth, viewportHeight);
 		Keyboard = new Keyboard([
-			ConsoleKey.V,
+			ConsoleKey.C, ConsoleKey.V,
 			ConsoleKey.W, ConsoleKey.S, ConsoleKey.A, ConsoleKey.D,
 			ConsoleKey.Q, ConsoleKey.E,
 		]);
 		StereoPlayer = new Sound.StereoPlayer();
-		Player = new Player(0.8);
+		Player = new Player(0.8, 2.0);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, MaxCameraDepth, 2.0);
 		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.02, 0.5, 0.1);
-		var key = new Key(-3, -6);
-		var door = new Door((11, 0), 2, Orientation.NegX);
-		key.PickupCallback += key => {
-			DespawnEntity(key);
-			DespawnEntity(door);
-		};
+		var key = new Key(this, -3, -6);
+		var door = new Door(this, (11, 0), 2, Orientation.NegX);
 		Entities = new List<IEntity> {
 			// Left and right walls
 			new Wall(new HorSeg(-10, -10, 20)),
@@ -107,6 +103,9 @@ internal class Game : IDisposable
 			case ConsoleKey.E:
 				Player.Rotate(Camera.FovStep * 5);
 				break;
+			case ConsoleKey.C:
+				Player.Interact(EntitiesSpan);
+				break;
 			case ConsoleKey.V:
 				Lantern.FuelUp();
 				break;
@@ -142,6 +141,9 @@ internal class Game : IDisposable
 			entitiesToSpawn.Clear();
 			entitiesToDespawn.Clear();
 		}
+		foreach (IEntity entity in Entities)
+			if (entity is IDynamic dynamic)
+				dynamic.Tick();
 	}
 
 	public void TickGraphics()
