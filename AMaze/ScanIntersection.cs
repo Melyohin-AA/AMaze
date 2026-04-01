@@ -20,7 +20,7 @@ internal struct ScanIntersection
 
 	private static double Screen(double y, double innerDist, double dist, double offset)
 	{
-		return y * innerDist / dist + offset;
+		return y * innerDist / dist - offset;
 	}
 }
 

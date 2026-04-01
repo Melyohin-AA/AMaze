@@ -17,8 +17,9 @@ internal class Player
 		InteractionDist = interactionDist;
 	}
 
-	public void Move(double step, double rotOffset, Span<Entities.IEntity> entities)
+	public bool Move(double step, double rotOffset, Span<Entities.IEntity> entities)
 	{
+		double epsilon = step * step / 16.0;
 		double dx = Math.Cos(Rot + rotOffset) * step;
 		double dy = Math.Sin(Rot + rotOffset) * step;
 		(double, double) vxy = (dx, dy), vx = (dx, 0.0), vy = (0.0, dy);
@@ -27,11 +28,13 @@ internal class Player
 		(vectors[1], vectors[2]) = (Math.Abs(dx) > Math.Abs(dy)) ? (vx, vy) : (vy, vx);
 		foreach ((double vdx, double vdy) in vectors)
 		{
-			if (DoesCollide(MakeHitbox(X + vdx, Y + vdy), entities)) continue;
+			bool belowMin = vdx * vdx + vdy * vdy < epsilon;
+			if (belowMin || DoesCollide(MakeHitbox(X + vdx, Y + vdy), entities)) continue;
 			X += vdx;
 			Y += vdy;
-			return;
+			return true;
 		}
+		return false;
 	}
 	private static bool DoesCollide(Geometry.Rect hitbox, Span<Entities.IEntity> entities)
 	{

@@ -78,23 +78,19 @@ internal class Game : IDisposable
 		switch (key)
 		{
 			case ConsoleKey.W:
-				Player.Move(speed, 0.0, EntitiesSpan);
-				moved = true;
+				moved = Player.Move(speed, 0.0, EntitiesSpan);
 				startingWithLeftLeg = true;
 				break;
 			case ConsoleKey.S:
-				Player.Move(-speed, 0.0, EntitiesSpan);
-				moved = true;
+				moved = Player.Move(-speed, 0.0, EntitiesSpan);
 				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.A:
-				Player.Move(-speed, Math.PI / 2, EntitiesSpan);
-				moved = true;
+				moved = Player.Move(-speed, Math.PI / 2, EntitiesSpan);
 				startingWithLeftLeg = true;
 				break;
 			case ConsoleKey.D:
-				Player.Move(speed, Math.PI / 2, EntitiesSpan);
-				moved = true;
+				moved = Player.Move(speed, Math.PI / 2, EntitiesSpan);
 				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.Q:
@@ -128,7 +124,7 @@ internal class Game : IDisposable
 	}
 	private double CalcStepSine(bool startingWithLeftLeg)
 	{
-		double x = Camera.BobbingPhi / 2.0 + 1.2;
+		double x = Camera.BobbingPhi / 2.0 + 0.1;
 		return Math.Cos(startingWithLeftLeg ? x : x + Math.PI);
 	}
 

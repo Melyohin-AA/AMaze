@@ -1,15 +1,18 @@
+### v0.13
+* Updated walking
+
 ### v0.12.2
 * Added key shapes
 * Added interactable crosshair
 * Changed screen resolution to 181x121 chars to have the crosshair at the screen center
 
 ### v0.12.1
-* Added support entity interacting
+* Added support for entity interacting
 * Proper key-door logic + door opening animation
 
-### v0.12
+### v0.12.0
 * Added multi-section intersection mode
-* Added `Door` and `Pillor` entities
+* Added `Door` and `Pillar` entities
 
 ### v0.11
 * Added sound system
