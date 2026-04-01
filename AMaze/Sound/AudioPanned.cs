@@ -56,7 +56,6 @@ internal class AudioPanned : IDisposable
 			Console.Title = "VoiceError: " + err.Result.Description;
 			PlayEndedCb();
 		};
-		Console.WriteLine("start");
 		var result = SourceVoice.Start();
 		if (result.Failure)
 		{

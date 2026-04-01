@@ -7,8 +7,8 @@ internal class Game : IDisposable
 {
 	private const double MaxCameraDepth = 20.0;
 
-	private readonly List<IEntity> entitiesToSpawn;
-	private readonly HashSet<IEntity> entitiesToDespawn;
+	private readonly List<IEntity> entitiesToSpawn = new List<IEntity>();
+	private readonly HashSet<IEntity> entitiesToDespawn = new HashSet<IEntity>();
 
 	public Renderer Renderer { get; }
 	public Keyboard Keyboard { get; }
@@ -22,8 +22,6 @@ internal class Game : IDisposable
 
 	public Game(int viewportWidth, int viewportHeight)
 	{
-		entitiesToSpawn = new List<IEntity>();
-		entitiesToDespawn = new HashSet<IEntity>();
 		Renderer = new Renderer(viewportWidth, viewportHeight);
 		Keyboard = new Keyboard([
 			ConsoleKey.C, ConsoleKey.V,
@@ -34,8 +32,6 @@ internal class Game : IDisposable
 		Player = new Player(0.8, 2.0);
 		Camera = new Camera(Player, viewportWidth, viewportHeight, Math.PI / 2, MaxCameraDepth, 2.0);
 		Lantern = new Lantern(Camera, MaxCameraDepth, 2.5, 0.02, 0.5, 0.1);
-		var key = new Key(this, -3, -6);
-		var door = new Door(this, (11, 0), 2, Orientation.NegX);
 		Entities = new List<IEntity> {
 			// Left and right walls
 			new Wall(new HorSeg(-10, -10, 20)),
@@ -54,10 +50,14 @@ internal class Game : IDisposable
 			new Grid(new VertSeg(8, -3, 6), top: 0.8, bottom: -0.8),
 			new Wall(new VertSeg(8, -8, 5)),
 			new Wall(new VertSeg(8, 3, 5)),
-			// Door and key
-			door,
-			key,
-			new Pillar(-3, -6, -0.3),
+			// Door and keys
+			new Door(this, (11, 0), 2, Orientation.NegX, KeyShape.Diamond),
+			new Pillar(-6, -3, -0.3),
+			new Key(this, KeyShape.Diamond, -6, -3),
+			new Pillar(-6, 0, -0.3),
+			new Key(this, KeyShape.Eye, -6, 0),
+			new Pillar(-6, 3, -0.3),
+			new Key(this, KeyShape.H, -6, 3),
 		};
 	}
 
@@ -67,8 +67,8 @@ internal class Game : IDisposable
 		StereoPlayer.Dispose();
 	}
 
-	public void SpawnEntity(IEntity enity) => entitiesToSpawn.Add(enity);
-	public void DespawnEntity(IEntity enity) => entitiesToDespawn.Add(enity);
+	public void SpawnEntity(IEntity entity) => entitiesToSpawn.Add(entity);
+	public void DespawnEntity(IEntity entity) => entitiesToDespawn.Add(entity);
 
 	public bool TickPlayerControls()
 	{
@@ -134,22 +134,25 @@ internal class Game : IDisposable
 
 	public void TickLogic()
 	{
-		if ((entitiesToSpawn.Count > 0) || (entitiesToDespawn.Count > 0))
-		{
-			Entities.RemoveAll(entitiesToDespawn.Contains);
-			Entities.AddRange(entitiesToSpawn);
-			entitiesToSpawn.Clear();
-			entitiesToDespawn.Clear();
-		}
 		foreach (IEntity entity in Entities)
 			if (entity is IDynamic dynamic)
 				dynamic.Tick();
+		if (entitiesToDespawn.Count > 0)
+		{
+			Entities.RemoveAll(entitiesToDespawn.Contains);
+			entitiesToDespawn.Clear();
+		}
+		if (entitiesToSpawn.Count > 0)
+		{
+			Entities.AddRange(entitiesToSpawn);
+			entitiesToSpawn.Clear();
+		}
 	}
 
 	public void TickGraphics()
 	{
 		Lantern.Tick();
 		Camera.Scan(EntitiesSpan, Renderer.Buffer);
-		Renderer.Render();
+		Renderer.Render(Player.CanInteract(EntitiesSpan));
 	}
 }

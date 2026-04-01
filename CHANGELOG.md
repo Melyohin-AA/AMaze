@@ -1,3 +1,8 @@
+### v0.12.2
+* Added key shapes
+* Added interactable crosshair
+* Changed screen resolution to 181x121 chars to have the crosshair at the screen center
+
 ### v0.12.1
 * Added support entity interacting
 * Proper key-door logic + door opening animation

@@ -21,7 +21,7 @@ internal class Renderer
 	//private long elapsedTicksV;
 	//private int elapsedTicksI;
 
-	public void Render()
+	public void Render(bool crosshair)
 	{
 		//var sw = Stopwatch.StartNew();
 		var breakPoints = new List<int>(64);
@@ -42,6 +42,9 @@ internal class Renderer
 					ConsoleUpdater.SetCell(x, y, '#', color);
 			}
 		}
+		if (crosshair)
+			ConsoleUpdater.SetCell((short)(ViewportWidth / 2), (short)(ViewportHeight / 2), 'x',
+				new ConsoleUpdater.Color(0x7F));
 		//elapsedTicksV += sw.ElapsedTicks;
 		//elapsedTicksI++;
 		//var e1 = sw.ElapsedMilliseconds;

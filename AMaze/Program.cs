@@ -6,7 +6,7 @@ internal class Program
 {
 	static void Main()
 	{
-		const int vph = 120, vpw = vph * 3 / 2;
+		const int vph = 121, vpw = vph * 3 / 2;
 		const int targetPeriod = 33, possibleOversleepAmount = 16;
 		Console.Title = "AMaze";
 		ConfigureViewport(vpw, vph);

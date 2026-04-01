@@ -10,6 +10,7 @@ internal interface IEntity
 internal interface IInteractable
 {
 	void Interact();
+	bool CanInteract();
 }
 
 internal interface IDynamic

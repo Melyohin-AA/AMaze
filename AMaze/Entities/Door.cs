@@ -4,7 +4,6 @@ namespace AMaze.Entities;
 
 internal class Door : IEntity, IInteractable, IDynamic
 {
-	public const double KeyHoleSize = 0.5;
 	public const int StagesUntilOpen = 5000 / 33; // 5 seconds
 
 	private readonly Game game;
@@ -13,21 +12,25 @@ internal class Door : IEntity, IInteractable, IDynamic
 
 	public double CenterX { get; }
 	public double CenterY { get; }
+	public KeyShape KeyHoleShape { get; }
 	public bool AltPalette { get; }
 	public bool KeyApplied { get; set; }
 
 	private int stagesUntilOpen = StagesUntilOpen;
 
-	public Door(Game game, (double, double) center, double size, Orientation normal, bool altPalette = true)
+	public Door(Game game, (double, double) center, double size, Orientation normal, KeyShape keyHoleShape,
+		bool altPalette = true)
 	{
 		this.game = game;
 		(CenterX, CenterY) = center;
+		KeyHoleShape = keyHoleShape;
+		double khOffset = normal.Sign() / 256.0;
 		(mainGeom, keyHoleGeom) = normal.IsVert() ? (
 			(IGeom)new HorSeg(CenterX - size / 2, CenterY, size),
-			(IGeom)new HorSeg(CenterX - KeyHoleSize / 2, CenterY + normal.Sign() / 16.0, KeyHoleSize)
+			(IGeom)new HorSeg(CenterX - KeyShapeExt.Half, CenterY + khOffset, KeyShapeExt.Size)
 		) : (
 			(IGeom)new VertSeg(CenterX, CenterY - size / 2, size),
-			(IGeom)new VertSeg(CenterX + normal.Sign() / 16.0, CenterY - KeyHoleSize / 2, KeyHoleSize)
+			(IGeom)new VertSeg(CenterX + khOffset, CenterY - KeyShapeExt.Half, KeyShapeExt.Size)
 		);
 		AltPalette = altPalette;
 	}
@@ -46,9 +49,7 @@ internal class Door : IEntity, IInteractable, IDynamic
 			intersection.opaque = stagesUntilOpen == StagesUntilOpen;
 			if (!KeyApplied && keyHoleGeom.Intersect(sight, out var khInter))
 			{
-				double i2cDX = intersection.x - CenterX, i2cDY = intersection.y - CenterY;
-				double i2cDist = Math.Sqrt(i2cDX * i2cDX + i2cDY * i2cDY);
-				double keyHoleHalf = Math.Clamp(KeyHoleSize / 2 - i2cDist, 0.0, KeyHoleSize / 2);
+				double keyHoleHalf = KeyHoleShape.Height(intersection.x - CenterX, intersection.y - CenterY);
 				intersection.headSec = new ScanIntersectionSection { bottom = keyHoleHalf, altPalette = AltPalette };
 				intersection.extraSecs = new[] {
 					new ScanIntersectionSection { bottom = -keyHoleHalf, vantablack = true },
@@ -65,16 +66,16 @@ internal class Door : IEntity, IInteractable, IDynamic
 
 	public bool DoesCollide(Rect rect)
 	{
-		return (CalcBottom() < 0.0) && mainGeom.DoesIntersect(rect);
+		return (CalcBottom() < 0.1) && mainGeom.DoesIntersect(rect);
 	}
 
 	public void Interact()
 	{
-		if (!KeyApplied && (game.Player.KeyCount > 0))
-		{
-			KeyApplied = true;
-			game.Player.KeyCount--;
-		}
+		KeyApplied = KeyApplied || game.Player.UseKey(KeyHoleShape);
+	}
+	public bool CanInteract()
+	{
+		return !KeyApplied && (game.Player.KeyCount(KeyHoleShape) > 0);
 	}
 
 	public void Tick()

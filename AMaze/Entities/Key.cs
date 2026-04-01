@@ -3,21 +3,23 @@
 internal class Key : IEntity, IInteractable
 {
 	private readonly Game game;
+	private readonly KeyShape shape;
 	private readonly Geometry.Face face;
 
-	public Key(Game game, double x, double y)
+	public Key(Game game, KeyShape shape, double x, double y)
 	{
 		this.game = game;
-		face = new Geometry.Face(x, y, 0.25);
+		this.shape = shape;
+		face = new Geometry.Face(x, y, KeyShapeExt.Half);
 	}
 
 	public bool Intersect(Geometry.Seg sight, out ScanIntersection intersection)
 	{
 		if (face.Intersect(sight, out intersection, out double dist2))
 		{
-			double dist = Math.Sqrt(dist2);
-			intersection.top = face.Radius - dist;
-			intersection.headSec = new ScanIntersectionSection { bottom = dist - face.Radius, altPalette = true };
+			double half = shape.Height(dist2);
+			intersection.top = half;
+			intersection.headSec = new ScanIntersectionSection { bottom = -half, altPalette = true };
 			return true;
 		}
 		intersection = default;
@@ -28,7 +30,8 @@ internal class Key : IEntity, IInteractable
 
 	public void Interact()
 	{
-		game.Player.KeyCount++;
+		game.Player.AddKey(shape);
 		game.DespawnEntity(this);
 	}
+	public bool CanInteract() => true;
 }

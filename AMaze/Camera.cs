@@ -50,9 +50,9 @@ internal class Camera
 		intersections.Clear();
 		bool allOpaque = true;
 		var minOpaqueInter = new ScanIntersection { dist2 = double.MaxValue, opaque = true };
-		foreach (Entities.IEntity enity in entities)
+		for (int i = 0; i < entities.Length; i++)
 		{
-			if (!enity.Intersect(sight, out var inter)) continue;
+			if (!entities[i].Intersect(sight, out var inter)) continue;
 			double dx = Player.X - inter.x, dy = Player.Y - inter.y;
 			inter.dist2 = dx * dx + dy * dy;
 			intersections.Add(inter);
