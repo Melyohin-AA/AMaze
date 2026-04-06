@@ -18,6 +18,21 @@ internal class Wave
 		return new AudioMono(Format, Data);
 	}
 
+	public static Wave Noise(uint size)
+	{
+		var data = new byte[size * 2];
+		new Random().NextBytes(data);
+		return new Wave(new WaveFormat(8000, 16, 1), data);
+	}
+
+	public static Wave Beep(uint size)
+	{
+		var data = new byte[size * 2];
+		for (int i = 0; i < size; i++)
+			(data[i * 2], data[i * 2 + 1]) = ((i & 1) == 0) ? ((byte)0xFF, (byte)0x7F) : ((byte)0x00, (byte)0x80);
+		return new Wave(new WaveFormat(8000, 16, 1), data);
+	}
+
 	public static Wave Read(string filepath)
 	{
 		using var stream = new FileStream(filepath, FileMode.Open);
@@ -36,7 +51,6 @@ internal class Wave
 		byte[] data = reader.ReadBytes((int)size);
 		return new Wave(new WaveFormat(sampleRate, bits, channels), data);
 	}
-
 	private static bool SkipUntil(BinaryReader reader, uint mark)
 	{
 		const int limit = 256;

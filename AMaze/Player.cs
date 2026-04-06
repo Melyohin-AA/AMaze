@@ -2,6 +2,8 @@
 
 internal class Player
 {
+	private const double EarOffset = 0.5, VolK = 1.0;
+
 	private readonly int[] keyCount = new int[KeyShapeExt.Count];
 
 	public double HitboxHalf { get; }
@@ -79,6 +81,21 @@ internal class Player
 			x1 = X, x2 = X + Math.Cos(Rot) * InteractionDist,
 			y1 = Y, y2 = Y + Math.Sin(Rot) * InteractionDist,
 		};
+	}
+
+	public (float, float) GetSpatialVolume(double x, double y)
+	{
+		double eox = Math.Cos(Math.PI / 2 + Rot) * EarOffset;
+		double eoy = Math.Sin(Math.PI / 2 + Rot) * EarOffset;
+		double lx = X - eox, ly = Y - eoy;
+		double rx = X + eox, ry = Y + eoy;
+		double ldx = lx - x, ldy = ly - y;
+		double rdx = rx - x, rdy = ry - y;
+		double lDist = Math.Sqrt(ldx * ldx + ldy * ldy);
+		double rDist = Math.Sqrt(rdx * rdx + rdy * rdy);
+		float lVol = Convert.ToSingle(Math.Min(1.0, VolK / lDist));
+		float rVol = Convert.ToSingle(Math.Min(1.0, VolK / rDist));
+		return (lVol, rVol);
 	}
 
 	public int KeyCount(KeyShape shape)

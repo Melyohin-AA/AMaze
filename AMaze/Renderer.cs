@@ -37,6 +37,7 @@ internal class Renderer
 			for (byte j = 0; j < breakPoints.Count; j++)
 			{
 				int bp = breakPoints[j];
+				if (y >= bp) continue;
 				ConsoleUpdater.Color color = SelectLineColor(lines, y);
 				for (; y < bp; y++)
 					ConsoleUpdater.SetCell(x, y, '#', color);

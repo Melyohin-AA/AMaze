@@ -119,7 +119,10 @@ internal class Game : IDisposable
 		if ((stepSine0 > 0.0) != (stepSine1 > 0.0))
 		{
 			(float lv, float rv) = (stepSine1 > 0.0) ? (0.4f, 0.5f) : (0.5f, 0.4f);
-			StereoPlayer.PanAndPlay("step", lv, rv);
+			(_, var audio) = StereoPlayer.GetAudio("step");
+			audio.Pan(lv, rv);
+			audio.SubmitSourceBuffer(0);
+			audio.Play();
 		}
 	}
 	private double CalcStepSine(bool startingWithLeftLeg)

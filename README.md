@@ -1,4 +1,4 @@
-# AMaze v0.13
+# AMaze v0.14
 
 This is a terminal 2.5D game about mazes.
 

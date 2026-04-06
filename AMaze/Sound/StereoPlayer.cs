@@ -19,6 +19,7 @@ internal class StereoPlayer : IDisposable
 			AudioMono sample = Wave.Read(file.FullName).ToAudioMono();
 			monoSamples.Add(name, sample);
 		}
+		//monoSamples.Add("noise", Wave.Noise(8000 * 33 / 1000).ToAudioMono()); // 33ms
 	}
 
 	~StereoPlayer() => Dispose();
@@ -31,10 +32,10 @@ internal class StereoPlayer : IDisposable
 		xaudio2.Dispose();
 	}
 
-	public void PanAndPlay(string monoName, float leftVolume, float rightVolume)
+	public (AudioMono, AudioPanned) GetAudio(string monoName)
 	{
 		AudioMono mono = monoSamples[monoName];
-		var panned = new AudioPanned(xaudio2, masterVoice, mono, leftVolume, rightVolume);
-		panned.Play();
+		var panned = new AudioPanned(xaudio2, masterVoice, mono);
+		return (mono, panned);
 	}
 }

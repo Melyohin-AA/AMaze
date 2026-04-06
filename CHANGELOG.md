@@ -1,3 +1,7 @@
+### v0.14
+* Updated sound system
+* Added door shifting sound
+
 ### v0.13
 * Updated walking
 

@@ -4,7 +4,7 @@ namespace AMaze.Entities;
 
 internal class Door : IEntity, IInteractable, IDynamic
 {
-	public const int StagesUntilOpen = 5000 / 33; // 5 seconds
+	public const int Dur = 5000, StagesUntilOpen = Dur / 33; // 5 seconds
 
 	private readonly Game game;
 	private readonly IGeom mainGeom;
@@ -17,6 +17,7 @@ internal class Door : IEntity, IInteractable, IDynamic
 	public bool KeyApplied { get; set; }
 
 	private int stagesUntilOpen = StagesUntilOpen;
+	private Sound.AudioPanned? shiftSound;
 
 	public Door(Game game, (double, double) center, double size, Orientation normal, KeyShape keyHoleShape,
 		bool altPalette = true)
@@ -81,6 +82,26 @@ internal class Door : IEntity, IInteractable, IDynamic
 	public void Tick()
 	{
 		if (KeyApplied && (stagesUntilOpen > 0))
-			stagesUntilOpen--;
+		{
+			if (stagesUntilOpen == StagesUntilOpen)
+			{
+				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
+				(var mono, shiftSound) = game.StereoPlayer.GetAudio("shift");
+				shiftSound.Pan(lVol, rVol);
+				uint loopCount = (uint)(mono.Format.SampleRate * Dur / (mono.Size * 500)) + 1;
+				shiftSound.SubmitSourceBuffer(loopCount);
+				shiftSound.Play();
+			}
+			else
+			{
+				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
+				shiftSound!.Pan(lVol, rVol);
+			}
+			if (--stagesUntilOpen == 0)
+			{
+				shiftSound.Stop();
+				shiftSound = null;
+			}
+		}
 	}
 }

@@ -8,19 +8,18 @@ internal class AudioPanned : IDisposable
 
 	private bool disposed;
 
+	// owns
 	public IXAudio2SourceVoice SourceVoice { get; }
+	// uses
+	private readonly IXAudio2MasteringVoice masterVoice;
+	private readonly AudioMono audioMono;
 
 	public AudioPanned(
-		IXAudio2 xaudio2, IXAudio2MasteringVoice masterVoice, AudioMono audioMono, float leftVolume, float rightVolume)
+		IXAudio2 xaudio2, IXAudio2MasteringVoice masterVoice, AudioMono audioMono)
 	{
+		this.masterVoice = masterVoice;
+		this.audioMono = audioMono;
 		SourceVoice = xaudio2.CreateSourceVoice(audioMono.Format, true);
-		SourceVoice.SetOutputMatrix(masterVoice, 1, 2, [leftVolume, rightVolume]);
-		var buffer = new AudioBuffer {
-			AudioDataPointer = audioMono.Ptr,
-			AudioBytes = audioMono.Size,
-			Flags = BufferFlags.EndOfStream,
-		};
-		SourceVoice.SubmitSourceBuffer(buffer);
 	}
 
 	~AudioPanned() => Dispose();
@@ -38,11 +37,26 @@ internal class AudioPanned : IDisposable
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+				Console.Title = ex.Message;
 			}
 			SourceVoice.DestroyVoice();
 			SourceVoice.Dispose();
 		}
+	}
+
+	public void Pan(float leftVolume, float rightVolume)
+	{
+		SourceVoice.SetOutputMatrix(masterVoice, 1, 2, [leftVolume, rightVolume]);
+	}
+	public void SubmitSourceBuffer(uint loopCount)
+	{
+		var buffer = new AudioBuffer {
+			AudioDataPointer = audioMono.Ptr,
+			AudioBytes = audioMono.Size,
+			LoopCount = loopCount,
+			Flags = BufferFlags.EndOfStream,
+		};
+		SourceVoice.SubmitSourceBuffer(buffer);
 	}
 
 	public void Play()
@@ -62,6 +76,12 @@ internal class AudioPanned : IDisposable
 			Dispose();
 			throw new Exception(result.Description);
 		}
+	}
+
+	public void Stop()
+	{
+		SourceVoice.Stop();
+		PlayEndedCb();
 	}
 
 	private void PlayEndedCb()
