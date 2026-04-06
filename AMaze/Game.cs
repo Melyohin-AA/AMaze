@@ -118,9 +118,9 @@ internal class Game : IDisposable
 		double stepSine1 = CalcStepSine(startingWithLeftLeg);
 		if ((stepSine0 > 0.0) != (stepSine1 > 0.0))
 		{
-			(float lv, float rv) = (stepSine1 > 0.0) ? (0.4f, 0.5f) : (0.5f, 0.4f);
+			(float lVal, float rVal) = (stepSine1 > 0.0) ? (0.4f, 0.5f) : (0.5f, 0.4f);
 			(_, var audio) = StereoPlayer.GetAudio("step");
-			audio.Pan(lv, rv);
+			audio.Pan(lVal, rVal);
 			audio.SubmitSourceBuffer(0);
 			audio.Play();
 		}

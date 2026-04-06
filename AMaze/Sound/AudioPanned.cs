@@ -65,10 +65,10 @@ internal class AudioPanned : IDisposable
 		{
 			played.Add(this);
 		}
-		SourceVoice.StreamEnd += PlayEndedCb;
+		SourceVoice.StreamEnd += Unbound;
 		SourceVoice.VoiceError += (err) => {
 			Console.Title = "VoiceError: " + err.Result.Description;
-			PlayEndedCb();
+			Unbound();
 		};
 		var result = SourceVoice.Start();
 		if (result.Failure)
@@ -81,10 +81,10 @@ internal class AudioPanned : IDisposable
 	public void Stop()
 	{
 		SourceVoice.Stop();
-		PlayEndedCb();
+		Unbound();
 	}
 
-	private void PlayEndedCb()
+	private void Unbound()
 	{
 		lock (played)
 		{

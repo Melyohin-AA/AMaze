@@ -83,7 +83,12 @@ internal class Door : IEntity, IInteractable, IDynamic
 	{
 		if (KeyApplied && (stagesUntilOpen > 0))
 		{
-			if (stagesUntilOpen == StagesUntilOpen)
+			if (stagesUntilOpen < StagesUntilOpen)
+			{
+				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
+				shiftSound!.Pan(lVol, rVol);
+			}
+			else
 			{
 				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
 				(var mono, shiftSound) = game.StereoPlayer.GetAudio("shift");
@@ -91,11 +96,6 @@ internal class Door : IEntity, IInteractable, IDynamic
 				uint loopCount = (uint)(mono.Format.SampleRate * Dur / (mono.Size * 500)) + 1;
 				shiftSound.SubmitSourceBuffer(loopCount);
 				shiftSound.Play();
-			}
-			else
-			{
-				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
-				shiftSound!.Pan(lVol, rVol);
 			}
 			if (--stagesUntilOpen == 0)
 			{
