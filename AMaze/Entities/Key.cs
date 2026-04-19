@@ -32,6 +32,11 @@ internal class Key : IEntity, IInteractable
 	{
 		game.Player.AddKey(shape);
 		game.DespawnEntity(this);
+		(_, var panned) = game.StereoPlayer.GetAudio("rustle");
+		(float lVol, float rVol) = game.Player.GetSpatialVolume(face.X, face.Y);
+		panned.Pan(lVol, rVol);
+		panned.SubmitSourceBuffer(0);
+		panned.Play();
 	}
 	public bool CanInteract() => true;
 }

@@ -1,4 +1,7 @@
-### v0.14
+### v0.14.1
+* Added key picking and key applying sounds
+
+### v0.14.0
 * Updated sound system
 * Added door shifting sound
 

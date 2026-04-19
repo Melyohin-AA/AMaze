@@ -1,3 +1,5 @@
 Resource	Origin
 step.wav	stone_slab1.wav by NistuGgner -- https://freesound.org/s/700535/ -- License: Creative Commons 0
 shift.wav	stone_slab3.wav by NistuGgner -- https://freesound.org/s/700537/ -- License: Creative Commons 0
+click.wav	Videogame Menu BUTTON CLICK by Christopherderp -- https://freesound.org/s/342200/ -- License: Creative Commons 0
+rustle.wav	Zip and Rustling fabric by Coo01 -- https://freesound.org/s/728156/ -- License: Creative Commons 0

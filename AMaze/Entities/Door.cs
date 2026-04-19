@@ -4,7 +4,7 @@ namespace AMaze.Entities;
 
 internal class Door : IEntity, IInteractable, IDynamic
 {
-	public const int Dur = 5000, StagesUntilOpen = Dur / 33; // 5 seconds
+	public const int Dur = 5000, OpeningStartStages = Dur / 33, StagesUntilOpen = OpeningStartStages + 15;
 
 	private readonly Game game;
 	private readonly IGeom mainGeom;
@@ -39,7 +39,7 @@ internal class Door : IEntity, IInteractable, IDynamic
 	private double CalcBottom()
 	{
 		// maps [0, max] to [0.8, -1]
-		return 0.8 - stagesUntilOpen / (double)StagesUntilOpen * 1.8;
+		return 0.8 - Math.Min(1.0, stagesUntilOpen / (double)OpeningStartStages) * 1.8;
 	}
 
 	public bool Intersect(Seg sight, out ScanIntersection intersection)
@@ -72,7 +72,15 @@ internal class Door : IEntity, IInteractable, IDynamic
 
 	public void Interact()
 	{
-		KeyApplied = KeyApplied || game.Player.UseKey(KeyHoleShape);
+		if (!KeyApplied && game.Player.UseKey(KeyHoleShape))
+		{
+			KeyApplied = true;
+			(_, var panned) = game.StereoPlayer.GetAudio("click");
+			(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
+			panned.Pan(lVol, rVol);
+			panned.SubmitSourceBuffer(0);
+			panned.Play();
+		}
 	}
 	public bool CanInteract()
 	{
@@ -83,12 +91,12 @@ internal class Door : IEntity, IInteractable, IDynamic
 	{
 		if (KeyApplied && (stagesUntilOpen > 0))
 		{
-			if (stagesUntilOpen < StagesUntilOpen)
+			if (stagesUntilOpen < OpeningStartStages)
 			{
 				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
 				shiftSound!.Pan(lVol, rVol);
 			}
-			else
+			else if (stagesUntilOpen == OpeningStartStages)
 			{
 				(float lVol, float rVol) = game.Player.GetSpatialVolume(CenterX, CenterY);
 				(var mono, shiftSound) = game.StereoPlayer.GetAudio("shift");
@@ -99,7 +107,7 @@ internal class Door : IEntity, IInteractable, IDynamic
 			}
 			if (--stagesUntilOpen == 0)
 			{
-				shiftSound.Stop();
+				shiftSound!.Stop();
 				shiftSound = null;
 			}
 		}
