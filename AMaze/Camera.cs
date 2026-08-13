@@ -27,7 +27,7 @@ internal class Camera
 		var sight = new Geometry.Seg { x1 = Player.X, y1 = Player.Y };
 		for (int i = 0; i < ViewportWidth; i++)
 		{
-			double dir = (i - ViewportWidth / 2) * FovStep;
+			double dir = (ViewportWidth / 2 - i) * FovStep;
 			sight.x2 = sight.x1 + Math.Cos(Player.Rot + dir) * DepthCap;
 			sight.y2 = sight.y1 + Math.Sin(Player.Rot + dir) * DepthCap;
 			GetIntersectionsSortedByDist2UntilOpaque(sight, entities, intersections);

@@ -1,3 +1,7 @@
+### v0.14.2
+* Fixed horizontally mirrored camera and controls.
+* Fixed `Circle.Intersect` method.
+
 ### v0.14.1
 * Added key picking and key applying sounds
 

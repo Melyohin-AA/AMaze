@@ -17,8 +17,8 @@ internal class Circle : IGeom
 	{
 		intersection = default;
 		double dx = ray.x1 - X, dy = ray.y1 - Y;
-		double a = ray.x2 * ray.x2 + ray.y2 * ray.y2;
-		double b = (dx * ray.x2 + dy * ray.y2) * 2.0;
+		double a = ray.DX * ray.DX + ray.DY * ray.DY;
+		double b = (dx * ray.DX + dy * ray.DY) * 2.0;
 		double c = dx * dx + dy * dy - Radius * Radius;
 		double D = b * b - 4 * a * c;
 		if (D < 0) return false;
@@ -27,8 +27,13 @@ internal class Circle : IGeom
 		double t2 = (-b + sqrtD) / (2 * a);
 		if ((t1 < 0.0) && (t2 < 0.0)) return false;
 		// Returning only one of two solutions
-		double t = (t1 >= 0.0) ? t1 : t2;
-		intersection = new ScanIntersection { x = ray.x1 + t * ray.x2, y = ray.y1 + t * ray.y2 };
+		double t;
+		if ((t1 >= 0.0) && (t1 <= 1.0))
+			t = t1;
+		else if ((t2 >= 0.0) && (t2 <= 1.0))
+			t = t2;
+		else return false;
+		intersection = new ScanIntersection { x = ray.x1 + t * ray.DX, y = ray.y1 + t * ray.DY };
 		return true;
 	}
 

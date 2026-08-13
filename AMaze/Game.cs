@@ -86,18 +86,18 @@ internal class Game : IDisposable
 				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.A:
-				moved = Player.Move(-speed, Math.PI / 2, EntitiesSpan);
+				moved = Player.Move(speed, Math.PI / 2, EntitiesSpan);
 				startingWithLeftLeg = true;
 				break;
 			case ConsoleKey.D:
-				moved = Player.Move(speed, Math.PI / 2, EntitiesSpan);
+				moved = Player.Move(-speed, Math.PI / 2, EntitiesSpan);
 				startingWithLeftLeg = false;
 				break;
 			case ConsoleKey.Q:
-				Player.Rotate(-Camera.FovStep * 5);
+				Player.Rotate(Camera.FovStep * 5);
 				break;
 			case ConsoleKey.E:
-				Player.Rotate(Camera.FovStep * 5);
+				Player.Rotate(Camera.FovStep * -5);
 				break;
 			case ConsoleKey.C:
 				Player.Interact(EntitiesSpan);
